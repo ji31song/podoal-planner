@@ -1,0 +1,27 @@
+{
+  "rules": {
+    "invites": {
+      "$code": {
+        ".read": "auth != null",
+        ".write": "auth != null && !data.exists() && newData.exists()"
+      }
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "families": {
+      "$fid": {
+        ".read": "auth != null && data.child('auth').child(auth.uid).exists()",
+        ".write": "auth != null && (data.child('auth').child(auth.uid).exists() || !data.exists())",
+        "auth": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && newData.val() === root.child('families').child($fid).child('meta').child('inviteCode').val()"
+          }
+        }
+      }
+    }
+  }
+}

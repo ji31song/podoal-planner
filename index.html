@@ -230,7 +230,26 @@
   }
   footer { text-align: center; font-size: 11px; color: #BDB8B1; margin-top: 24px; }
 
-  /* ===== 가족 설정 화면 ===== */
+  /* ===== 시작/로그인/가족 설정 화면 ===== */
+  .ovl {
+    position: fixed; inset: 0; z-index: 100; background: #F5F3F0;
+    display: flex; align-items: center; justify-content: center; padding: 24px 16px;
+  }
+  .big-btn {
+    display: block; width: 100%; margin-top: 12px; border: none; background: #3B3835;
+    color: #fff; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .big-btn.alt { background: #7C5296; }
+  .ovl .divider { text-align: center; color: #B2ADA6; font-size: 12px; margin: 18px 0 2px; }
+  .link-btn {
+    background: none; border: none; color: #8B8680; font-size: 12px; text-decoration: underline;
+    cursor: pointer; margin: 14px auto 0; display: block;
+  }
+  .err-msg { color: #D64545; font-size: 13px; min-height: 18px; margin-top: 10px; text-align: center; }
+  #inviteInfo {
+    margin-top: 14px; background: #F7F3EC; border-radius: 12px; padding: 12px; text-align: center;
+  }
+  #inviteInfo .code { font-size: 22px; font-weight: 800; letter-spacing: 3px; margin: 4px 0; }
   #setupScreen {
     position: fixed; inset: 0; z-index: 100; background: #F5F3F0;
     display: flex; align-items: flex-start; justify-content: center;
@@ -285,6 +304,31 @@
 </style>
 </head>
 <body>
+<div id="authScreen" class="ovl" style="display:none">
+  <div class="setup-card" style="text-align:center">
+    <h2><svg class="icon" style="width:20px;height:20px;vertical-align:-3px" viewBox="0 0 24 24"><path d="M22 5V2l-5.89 5.89"/><circle cx="16.6" cy="15.89" r="3"/><circle cx="8.11" cy="7.4" r="3"/><circle cx="12.35" cy="11.65" r="3"/><circle cx="13.91" cy="5.85" r="3"/><circle cx="18.15" cy="10.09" r="3"/><circle cx="6.56" cy="13.2" r="3"/><circle cx="10.8" cy="17.44" r="3"/><circle cx="5" cy="19" r="3"/></svg> 포도알플래너</h2>
+    <div class="sub">가족이 함께 쓰는 일정관리</div>
+    <button class="big-btn" id="googleLoginBtn">구글로 시작하기</button>
+    <div class="err-msg" id="authError"></div>
+  </div>
+</div>
+
+<div id="startScreen" class="ovl" style="display:none">
+  <div class="setup-card">
+    <h2 style="text-align:center">시작하기</h2>
+    <div class="sub">처음이면 가족을 만들고, 가족이 이미 만들었다면 초대 코드로 참여하세요</div>
+    <button class="big-btn" id="createFamilyBtn">새 가족 만들기</button>
+    <div class="divider">─ 또는 ─</div>
+    <label style="font-size:13px;font-weight:700;display:block;margin:10px 0 6px">초대 코드로 참여</label>
+    <div class="add-row" style="margin-top:0">
+      <input type="text" id="joinCodeInput" placeholder="예: AB2CD3" maxlength="8" style="text-transform:uppercase" autocomplete="off">
+      <button id="joinFamilyBtn">참여</button>
+    </div>
+    <div class="err-msg" id="startError"></div>
+    <button class="link-btn" id="logoutBtn1">다른 계정으로 로그인</button>
+  </div>
+</div>
+
 <div id="setupScreen" style="display:none">
   <div class="setup-card">
     <h2><svg class="icon" style="width:20px;height:20px;vertical-align:-3px" viewBox="0 0 24 24"><path d="M22 5V2l-5.89 5.89"/><circle cx="16.6" cy="15.89" r="3"/><circle cx="8.11" cy="7.4" r="3"/><circle cx="12.35" cy="11.65" r="3"/><circle cx="13.91" cy="5.85" r="3"/><circle cx="18.15" cy="10.09" r="3"/><circle cx="6.56" cy="13.2" r="3"/><circle cx="10.8" cy="17.44" r="3"/><circle cx="5" cy="19" r="3"/></svg> 포도알플래너</h2>
@@ -294,8 +338,14 @@
     <label>구성원</label>
     <div id="setupMembers"></div>
     <button id="setupAddMember">+ 구성원 추가</button>
+    <div id="inviteInfo" style="display:none">
+      <div style="font-size:12px; color:#8B8680">가족 초대 코드</div>
+      <div class="code" id="inviteCodeText"></div>
+      <div style="font-size:11px; color:#B2ADA6">가족의 폰에서 "초대 코드로 참여"에 이 코드를 입력하면 함께 쓸 수 있어요</div>
+    </div>
     <button id="setupSave">저장하기</button>
     <button id="setupClose" style="display:none">닫기</button>
+    <button class="link-btn" id="logoutBtn2" style="display:none">로그아웃</button>
     <div id="setupError"></div>
   </div>
 </div>
@@ -421,32 +471,49 @@ function personOf(id) {
 }
 
 /* ===== 저장소 (Firebase 또는 localStorage) ===== */
-const FAMILY_PATH = "families/demo"; // Firebase 연동 시 가족별 경로로 교체 예정
 const LS_KEY = "podoal-planner";
 let store = null;
+let db = null, dbMod = null, authMod = null, fbAuth = null;
+let uid = null, familyId = null;
+let fbMode = false;
+
+function showScreen(name) {
+  document.getElementById("authScreen").style.display = name === "auth" ? "flex" : "none";
+  document.getElementById("startScreen").style.display = name === "start" ? "flex" : "none";
+  if (name !== "setup") document.getElementById("setupScreen").style.display = "none";
+}
+
+function setSync(text, on) {
+  const st = document.getElementById("syncStatus");
+  st.textContent = text;
+  st.classList.toggle("on", !!on);
+}
 
 async function initStore() {
   if (window.FIREBASE_CONFIG) {
     try {
       const appMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-      const dbMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+      dbMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+      authMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
       const app = appMod.initializeApp(window.FIREBASE_CONFIG);
-      const db = dbMod.getDatabase(app);
-      const rootRef = dbMod.ref(db, FAMILY_PATH);
-      store = {
-        write(path, value) { dbMod.set(dbMod.ref(db, `${FAMILY_PATH}/${path}`), value); },
-      };
-      dbMod.onValue(rootRef, (snap) => {
-        const v = snap.val();
-        data = normalize(v || JSON.parse(JSON.stringify(EMPTY_DATA)));
-        render();
+      db = dbMod.getDatabase(app);
+      fbAuth = authMod.getAuth(app);
+      fbMode = true;
+      setSync("로그인 확인 중", false);
+      authMod.onAuthStateChanged(fbAuth, async (user) => {
+        if (!user) { setSync("로그인이 필요해요", false); showScreen("auth"); return; }
+        uid = user.uid;
+        try {
+          const snap = await dbMod.get(dbMod.ref(db, `users/${uid}/familyId`));
+          familyId = snap.val();
+        } catch (e) { familyId = null; }
+        if (!familyId) { setSync("가족을 만들거나 참여해 주세요", false); showScreen("start"); return; }
+        attachFamily();
       });
-      const st = document.getElementById("syncStatus");
-      st.textContent = "실시간 공유 중";
-      st.classList.add("on");
       return;
     } catch (e) {
       console.error("Firebase 연결 실패, 로컬 저장으로 전환:", e);
+      fbMode = false;
     }
   }
   // localStorage 모드
@@ -467,6 +534,94 @@ async function initStore() {
     },
   };
   render();
+}
+
+function attachFamily() {
+  const base = `families/${familyId}`;
+  store = {
+    write(path, value) { dbMod.set(dbMod.ref(db, `${base}/${path}`), value); },
+  };
+  showScreen("app");
+  dbMod.onValue(dbMod.ref(db, base), (snap) => {
+    const v = snap.val();
+    data = normalize(v || JSON.parse(JSON.stringify(EMPTY_DATA)));
+    setSync("실시간 공유 중", true);
+    render();
+  }, (err) => {
+    console.error("가족 데이터 접근 실패:", err);
+    familyId = null;
+    setSync("가족을 만들거나 참여해 주세요", false);
+    showScreen("start");
+  });
+}
+
+/* ===== 가족 만들기 / 초대 코드 참여 ===== */
+// 헷갈리는 글자(O/0, I/1/L)를 뺀 초대 코드 생성
+async function genInviteCode() {
+  const A = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  for (let t = 0; t < 8; t++) {
+    let c = "";
+    for (let i = 0; i < 6; i++) c += A[Math.floor(Math.random() * A.length)];
+    const snap = await dbMod.get(dbMod.ref(db, `invites/${c}`));
+    if (!snap.exists()) return c;
+  }
+  throw new Error("초대 코드 생성에 실패했어요");
+}
+
+async function createFamily() {
+  const errBox = document.getElementById("startError");
+  errBox.textContent = "";
+  try {
+    const code = await genInviteCode();
+    const fid = dbMod.push(dbMod.ref(db, "families")).key;
+    await dbMod.set(dbMod.ref(db, `families/${fid}`), {
+      meta: { inviteCode: code, owner: uid, createdAt: Date.now() },
+      auth: { [uid]: code },
+      family: { name: "", members: [] },
+    });
+    await dbMod.set(dbMod.ref(db, `invites/${code}`), fid);
+    await dbMod.set(dbMod.ref(db, `users/${uid}`), { familyId: fid });
+    familyId = fid;
+    attachFamily();
+  } catch (e) {
+    console.error(e);
+    errBox.textContent = "가족을 만들지 못했어요. 잠시 후 다시 시도해 주세요";
+  }
+}
+
+async function joinFamily() {
+  const errBox = document.getElementById("startError");
+  errBox.textContent = "";
+  const code = document.getElementById("joinCodeInput").value.replace(/[^0-9A-Za-z]/g, "").toUpperCase();
+  if (code.length < 6) { errBox.textContent = "6자리 초대 코드를 입력해 주세요"; return; }
+  try {
+    const snap = await dbMod.get(dbMod.ref(db, `invites/${code}`));
+    const fid = snap.val();
+    if (!fid) { errBox.textContent = "초대 코드를 찾을 수 없어요. 다시 확인해 주세요"; return; }
+    await dbMod.set(dbMod.ref(db, `families/${fid}/auth/${uid}`), code);
+    await dbMod.set(dbMod.ref(db, `users/${uid}`), { familyId: fid });
+    familyId = fid;
+    attachFamily();
+  } catch (e) {
+    console.error(e);
+    errBox.textContent = "참여하지 못했어요. 코드를 다시 확인해 주세요";
+  }
+}
+
+async function googleLogin() {
+  const errBox = document.getElementById("authError");
+  errBox.textContent = "";
+  try {
+    await authMod.signInWithPopup(fbAuth, new authMod.GoogleAuthProvider());
+  } catch (e) {
+    console.error(e);
+    errBox.textContent = "로그인에 실패했어요. 다시 시도해 주세요";
+  }
+}
+
+async function logout() {
+  if (fbAuth) await authMod.signOut(fbAuth);
+  location.reload();
 }
 
 // Firebase는 빈 객체/배열을 지우기 때문에 형태 보정
@@ -945,6 +1100,11 @@ function openSetup(closable) {
   screen.style.display = "flex";
   document.getElementById("setupClose").style.display = closable ? "block" : "none";
   document.getElementById("setupError").textContent = "";
+  // Firebase 모드면 초대 코드와 로그아웃 표시
+  const hasCode = fbMode && data && data.meta && data.meta.inviteCode;
+  document.getElementById("inviteInfo").style.display = hasCode ? "block" : "none";
+  if (hasCode) document.getElementById("inviteCodeText").textContent = data.meta.inviteCode;
+  document.getElementById("logoutBtn2").style.display = fbMode ? "block" : "none";
   document.getElementById("setupFamilyName").value = (data && data.family && data.family.name) || "";
   const box = document.getElementById("setupMembers");
   box.innerHTML = "";
@@ -1001,6 +1161,12 @@ document.getElementById("editItemsBtn").addEventListener("click", () => { editin
 document.getElementById("editSchedBtn").addEventListener("click", () => { editingSched = !editingSched; render(); });
 document.getElementById("editPhoneBtn").addEventListener("click", () => { editingPhone = !editingPhone; render(); });
 document.getElementById("settingsBtn").addEventListener("click", () => openSetup(true));
+document.getElementById("googleLoginBtn").addEventListener("click", googleLogin);
+document.getElementById("createFamilyBtn").addEventListener("click", createFamily);
+document.getElementById("joinFamilyBtn").addEventListener("click", joinFamily);
+document.getElementById("joinCodeInput").addEventListener("keydown", e => { if (e.key === "Enter") joinFamily(); });
+document.getElementById("logoutBtn1").addEventListener("click", logout);
+document.getElementById("logoutBtn2").addEventListener("click", logout);
 document.getElementById("setupAddMember").addEventListener("click", () => {
   document.getElementById("setupMembers").appendChild(makeMemberRow(null));
 });
