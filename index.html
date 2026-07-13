@@ -329,6 +329,15 @@
   </div>
 </div>
 
+<div id="whoScreen" class="ovl" style="display:none">
+  <div class="setup-card" style="text-align:center">
+    <h2>누구인가요?</h2>
+    <div class="sub">본인을 선택하면 이 계정으로 기억돼요</div>
+    <div id="whoButtons"></div>
+    <button class="link-btn" id="whoOpenSetup">내 이름이 목록에 없어요</button>
+  </div>
+</div>
+
 <div id="setupScreen" style="display:none">
   <div class="setup-card">
     <h2><svg class="icon" style="width:20px;height:20px;vertical-align:-3px" viewBox="0 0 24 24"><path d="M22 5V2l-5.89 5.89"/><circle cx="16.6" cy="15.89" r="3"/><circle cx="8.11" cy="7.4" r="3"/><circle cx="12.35" cy="11.65" r="3"/><circle cx="13.91" cy="5.85" r="3"/><circle cx="18.15" cy="10.09" r="3"/><circle cx="6.56" cy="13.2" r="3"/><circle cx="10.8" cy="17.44" r="3"/><circle cx="5" cy="19" r="3"/></svg> 포도알플래너</h2>
@@ -476,10 +485,13 @@ let store = null;
 let db = null, dbMod = null, authMod = null, fbAuth = null;
 let uid = null, familyId = null;
 let fbMode = false;
+let myMemberId = null;
+let identityApplied = false; // 접속 후 처음 한 번만 내 탭으로 이동
 
 function showScreen(name) {
   document.getElementById("authScreen").style.display = name === "auth" ? "flex" : "none";
   document.getElementById("startScreen").style.display = name === "start" ? "flex" : "none";
+  document.getElementById("whoScreen").style.display = name === "who" ? "flex" : "none";
   if (name !== "setup") document.getElementById("setupScreen").style.display = "none";
 }
 
@@ -655,6 +667,13 @@ function render() {
   if (!data) return;
   if (!members().length) { openSetup(false); return; }
   document.getElementById("setupScreen").style.display = "none";
+  // Firebase 모드: 이 계정이 누구인지 아직 안 정했으면 선택 화면
+  if (fbMode && uid) {
+    myMemberId = (data.memberOf || {})[uid] || null;
+    if (!myMemberId) { openWhoScreen(); return; }
+    document.getElementById("whoScreen").style.display = "none";
+    if (!identityApplied) { currentMemberId = myMemberId; identityApplied = true; }
+  }
   if (!curMember()) currentMemberId = members()[0].id;
   else currentMemberId = curMember().id;
 
@@ -930,13 +949,15 @@ function renderComments() {
       store.write(`people/${m.id}/comments/${selectedDate}`, next.length ? next : null);
     });
   });
-  // 탭이 바뀌면 작성자 목록 갱신, 기본값은 본인이 아닌 첫 구성원
+  // 탭이 바뀌면 작성자 목록 갱신 — 기본값: 내 identity, 없으면 본인이 아닌 첫 구성원
   const sel = document.getElementById("commentWho");
   if (commentTabFor !== m.id || sel.options.length !== members().length) {
     commentTabFor = m.id;
     sel.innerHTML = members().map(mm => `<option>${escapeHtml(mm.name)}</option>`).join("");
+    const mine = members().find(mm => mm.id === myMemberId);
     const other = members().find(mm => mm.id !== m.id);
-    if (other) sel.value = other.name;
+    if (mine) sel.value = mine.name;
+    else if (other) sel.value = other.name;
   }
 }
 
@@ -1075,6 +1096,22 @@ function renderPhonebook() {
   pBtn.classList.toggle("editing", editingPhone);
 }
 
+/* ===== 누구인가요? (계정-구성원 연결) ===== */
+function openWhoScreen() {
+  showScreen("who");
+  const box = document.getElementById("whoButtons");
+  box.innerHTML = "";
+  members().forEach(m => {
+    const b = document.createElement("button");
+    b.className = "big-btn";
+    b.textContent = m.name + (m.role === "child" ? " (아이)" : "");
+    b.addEventListener("click", () => {
+      store.write(`memberOf/${uid}`, m.id);
+    });
+    box.appendChild(b);
+  });
+}
+
 /* ===== 가족 설정 화면 ===== */
 function makeMemberRow(m) {
   const row = document.createElement("div");
@@ -1175,6 +1212,7 @@ document.getElementById("joinFamilyBtn").addEventListener("click", joinFamily);
 document.getElementById("joinCodeInput").addEventListener("keydown", e => { if (e.key === "Enter") joinFamily(); });
 document.getElementById("logoutBtn1").addEventListener("click", logout);
 document.getElementById("logoutBtn2").addEventListener("click", logout);
+document.getElementById("whoOpenSetup").addEventListener("click", () => openSetup(true));
 document.getElementById("setupAddMember").addEventListener("click", () => {
   document.getElementById("setupMembers").appendChild(makeMemberRow(null));
 });
