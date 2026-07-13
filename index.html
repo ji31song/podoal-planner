@@ -760,9 +760,17 @@ function renderGrapes(done, total) {
       html += `<button class="grape-btn" id="giveGrapeBtn">다 했어요! 포도알 주세요</button>`;
     }
   }
-  html += `<div class="grape-count" style="margin-top:10px">모은 포도알 <b>${count}</b>개 ${count >= 30 ? "· 포도송이 완성!" : "(30개 모으면 포도송이 완성)"}</div>`;
+  const bunches = Math.floor(count / 30);
+  const cur = count % 30;
+  if (count > 0 && cur === 0) {
+    html += `<div class="grape-done">포도송이 완성! 🎉 새 포도송이를 시작해요</div>`;
+  }
+  if (bunches > 0) {
+    html += `<div class="grape-count" style="margin-top:8px">완성한 포도송이 🍇 <b>${bunches}</b>송이</div>`;
+  }
+  html += `<div class="grape-count" style="margin-top:${bunches > 0 ? 2 : 10}px">이번 판 포도알 <b>${cur}</b>개 (30개 모으면 포도송이 완성)</div>`;
   html += `<div class="grape-board">`;
-  for (let i = 0; i < 30; i++) html += `<div class="grape ${i < count ? "on" : ""}"></div>`;
+  for (let i = 0; i < 30; i++) html += `<div class="grape ${i < cur ? "on" : ""}"></div>`;
   html += `</div>`;
   area.innerHTML = html;
 
