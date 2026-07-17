@@ -247,7 +247,7 @@
   }
   .err-msg { color: #D64545; font-size: 13px; min-height: 18px; margin-top: 10px; text-align: center; }
   #inviteInfo {
-    margin-top: 14px; background: #F7F3EC; border-radius: 12px; padding: 12px; text-align: center;
+    background: #F7F3EC; border-radius: 22px; padding: 16px; text-align: center;
   }
   #inviteInfo .code { font-size: 22px; font-weight: 800; letter-spacing: 3px; }
   #inviteInfo .code-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0; }
@@ -255,15 +255,25 @@
     border: none; background: #8E62AC; color: #fff; border-radius: 10px;
     padding: 7px 14px; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit;
   }
-  #setupScreen {
+  #setupScreen, #registerScreen {
     position: fixed; inset: 0; z-index: 100; background: #F5F3F0;
     display: flex; align-items: flex-start; justify-content: center;
-    padding: 24px 16px; overflow-y: auto;
+    padding: calc(env(safe-area-inset-top, 0px) + 48px) 16px 24px;
+    overflow-y: auto;
   }
   .setup-card {
-    background: #fff; border-radius: 18px; padding: 22px; width: 100%; max-width: 480px;
+    position: relative; background: #fff; border-radius: 18px; padding: 22px; width: 100%; max-width: 480px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.07);
   }
+  .setup-col { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 14px; }
+  #setupHomeBtn {
+    position: fixed; top: calc(env(safe-area-inset-top, 0px) + 5px); right: 16px;
+    z-index: 102; width: 38px; height: 38px;
+    display: none; align-items: center; justify-content: center;
+    border: 1px solid #E5DED3; border-radius: 50%; background: #FFFDF8;
+    color: #6E655A; cursor: pointer;
+  }
+  #setupHomeBtn .icon { width: 19px; height: 19px; }
   .setup-card h2 { font-size: 18px; text-align: center; margin-bottom: 4px; }
   .setup-card .sub { font-size: 12px; color: #8B8680; text-align: center; margin-bottom: 16px; }
   .setup-card label { font-size: 13px; font-weight: 700; display: block; margin: 14px 0 6px; }
@@ -287,20 +297,48 @@
     border: none; background: #FDE8E8; color: #D64545; border-radius: 8px;
     width: 28px; height: 28px; font-size: 13px; cursor: pointer; flex-shrink: 0;
   }
-  #setupAddMember {
+  .su-drag {
+    display: none; align-items: center; justify-content: center;
+    width: 26px; height: 34px; flex-shrink: 0; color: #B2ADA6;
+    font-size: 17px; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+  }
+  #setupMembers.editing .su-drag { display: flex; }
+  .su-row.dragging {
+    background: #fff; box-shadow: 0 6px 16px rgba(124,82,150,0.28);
+    border-color: #C9B3DC; position: relative; z-index: 5;
+  }
+  #setupAddMember, #regAddMember {
     display: block; width: 100%; margin-top: 10px; border: 1.5px dashed #C9C4BC;
     background: #FCFBFA; color: #6B6661; border-radius: 12px; padding: 10px;
     font-size: 13px; font-weight: 700; cursor: pointer;
   }
-  #setupSave {
-    display: block; width: 100%; margin-top: 16px; border: none; background: #3B3835;
+  .setup-btn-row { display: flex; gap: 8px; margin-top: 16px; }
+  #setupSave, #regSave {
+    flex: 2; border: none; background: #3B3835;
     color: #fff; border-radius: 12px; padding: 13px; font-size: 15px; font-weight: 700; cursor: pointer;
   }
-  #setupClose {
-    display: block; width: 100%; margin-top: 8px; border: none; background: #ECEAE6;
-    color: #6B6661; border-radius: 12px; padding: 11px; font-size: 14px; cursor: pointer;
+  #setupEditBtn {
+    flex: 1; border: 1px solid #D8D3CB; background: #fff; color: #5F5952;
+    border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
   }
-  #setupError { color: #D64545; font-size: 13px; text-align: center; min-height: 18px; margin-top: 8px; }
+  .settings-group-title { font-size: 14px; font-weight: 800; color: #3F372F; }
+  .settings-group-desc { margin-top: 5px; font-size: 11px; line-height: 1.5; color: #8B8680; }
+  .settings-action {
+    display: block; width: 100%; margin-top: 10px; border: 1px solid #D8D3CB;
+    background: #fff; color: #5F5952; border-radius: 12px; padding: 12px;
+    font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .settings-action.danger {
+    border-color: #F0CACA; background: #FFF8F8; color: #C43D3D;
+  }
+  .account-danger { margin-top: 16px; padding-top: 6px; }
+  .policy-links {
+    display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+    margin-top: 18px; font-size: 11px;
+  }
+  .policy-links a { color: #817A72; }
+  #setupError, #regError { color: #D64545; font-size: 13px; text-align: center; min-height: 18px; margin-top: 8px; }
 
 /* ===== 포도알 테마 (목업 컨셉) ===== */
   :root {
@@ -310,7 +348,7 @@
     --peach-pill: #F7E9D7; --peach-ink: #B07C4C; --line: #EFE9DC;
   }
   body { background: var(--cream); color: var(--ink2); }
-  .wrap { padding: 14px 16px 40px; }
+  .wrap { padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px 40px; }
 
   header {
     text-align: left; padding: 12px 4px 4px; display: flex; align-items: center;
@@ -399,13 +437,14 @@
   /* 포도알플래너 전용 화면 보정 */
   header { padding-right: 34px; }
   #settingsBtn { top: 50%; transform: translateY(-50%); }
-  .ovl, #setupScreen { background: var(--cream); }
+  .ovl, #setupScreen, #registerScreen { background: var(--cream); }
   .setup-card { border-radius: 22px; border: 1px solid #F4EEE1; box-shadow: 0 4px 14px rgba(124,82,150,0.06); }
   .setup-card h2, .setup-card label { color: var(--ink); }
   .big-btn { background: var(--grape); border-radius: 14px; }
   .big-btn.alt { background: var(--grape-d); }
-  #setupSave { background: var(--grape); border-radius: 14px; }
-  #setupAddMember { border-color: #DCCFEA; color: var(--grape-d); background: var(--grape-soft); }
+  #setupSave, #regSave { background: var(--grape); border-radius: 14px; }
+  #setupEditBtn { border-color: #DCCFEA; color: var(--grape-d); background: var(--grape-soft); border-radius: 14px; }
+  #setupAddMember, #regAddMember { border-color: #DCCFEA; color: var(--grape-d); background: var(--grape-soft); }
   #inviteInfo { background: var(--grape-soft); }
   #inviteInfo .code { color: var(--grape-d); }
   .tab { min-width: 76px; flex: 1 1 21%; }
@@ -450,33 +489,98 @@
 <div id="whoScreen" class="ovl" style="display:none">
   <div class="setup-card" style="text-align:center">
     <h2>누구인가요?</h2>
-    <div class="sub">본인을 선택하면 이 계정으로 기억돼요</div>
+    <div class="sub">본인을 한 번 선택하면 이 계정으로 안전하게 연결돼요</div>
     <div id="whoButtons"></div>
+    <div class="err-msg" id="whoError"></div>
     <button class="link-btn" id="whoOpenSetup">내 이름이 목록에 없어요</button>
   </div>
 </div>
 
+<div id="registerScreen" style="display:none">
+  <div class="setup-col">
+    <div class="setup-card">
+      <h2><svg class="icon" style="width:20px;height:20px;vertical-align:-3px" viewBox="0 0 24 24"><path d="M22 5V2l-5.89 5.89"/><circle cx="16.6" cy="15.89" r="3"/><circle cx="8.11" cy="7.4" r="3"/><circle cx="12.35" cy="11.65" r="3"/><circle cx="13.91" cy="5.85" r="3"/><circle cx="18.15" cy="10.09" r="3"/><circle cx="6.56" cy="13.2" r="3"/><circle cx="10.8" cy="17.44" r="3"/><circle cx="5" cy="19" r="3"/></svg> 포도알플래너</h2>
+      <div class="sub">우리 가족을 등록해 주세요 · 나중에 언제든 바꿀 수 있어요</div>
+      <label>가족 이름 (선택)</label>
+      <input type="text" id="regFamilyName" placeholder="예: 행복한 우리집" maxlength="20">
+      <label>구성원</label>
+      <div id="regMembers"></div>
+      <button id="regAddMember">+ 구성원 추가</button>
+      <div class="setup-btn-row">
+        <button id="regSave">저장하기</button>
+      </div>
+      <div id="regError"></div>
+    </div>
+    <div class="policy-links">
+      <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>
+      <a href="terms.html" target="_blank" rel="noopener">이용약관</a>
+      <a href="delete-account.html" target="_blank" rel="noopener">계정 삭제 안내</a>
+      <a href="support.html" target="_blank" rel="noopener">문의</a>
+    </div>
+  </div>
+</div>
+
 <div id="setupScreen" style="display:none">
-  <div class="setup-card">
-    <h2><svg class="icon" style="width:20px;height:20px;vertical-align:-3px" viewBox="0 0 24 24"><path d="M22 5V2l-5.89 5.89"/><circle cx="16.6" cy="15.89" r="3"/><circle cx="8.11" cy="7.4" r="3"/><circle cx="12.35" cy="11.65" r="3"/><circle cx="13.91" cy="5.85" r="3"/><circle cx="18.15" cy="10.09" r="3"/><circle cx="6.56" cy="13.2" r="3"/><circle cx="10.8" cy="17.44" r="3"/><circle cx="5" cy="19" r="3"/></svg> 포도알플래너</h2>
-    <div class="sub">우리 가족을 등록해 주세요 · 나중에 언제든 바꿀 수 있어요</div>
-    <label>가족 이름 (선택)</label>
-    <input type="text" id="setupFamilyName" placeholder="예: 행복한 우리집" maxlength="20">
-    <label>구성원</label>
-    <div id="setupMembers"></div>
-    <button id="setupAddMember">+ 구성원 추가</button>
-    <div id="inviteInfo" style="display:none">
+  <div class="setup-col">
+    <button id="setupHomeBtn" type="button" aria-label="홈으로 돌아가기" title="홈으로 돌아가기">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg>
+    </button>
+    <div class="setup-card">
+      <h2><svg class="icon" style="width:20px;height:20px;vertical-align:-3px" viewBox="0 0 24 24"><path d="M22 5V2l-5.89 5.89"/><circle cx="16.6" cy="15.89" r="3"/><circle cx="8.11" cy="7.4" r="3"/><circle cx="12.35" cy="11.65" r="3"/><circle cx="13.91" cy="5.85" r="3"/><circle cx="18.15" cy="10.09" r="3"/><circle cx="6.56" cy="13.2" r="3"/><circle cx="10.8" cy="17.44" r="3"/><circle cx="5" cy="19" r="3"/></svg> 설정</h2>
+      <div class="sub">가족 정보와 계정을 관리할 수 있어요</div>
+      <label>가족 이름</label>
+      <input type="text" id="setupFamilyName" placeholder="예: 행복한 우리집" maxlength="20">
+      <label>구성원</label>
+      <div id="setupMembers"></div>
+      <button id="setupAddMember">+ 구성원 추가</button>
+      <div id="claimRequests" style="display:none"></div>
+      <div class="setup-btn-row">
+        <button id="setupEditBtn" style="display:none">편집하기</button>
+        <button id="setupSave" style="display:none">저장하기</button>
+      </div>
+    </div>
+    <div id="inviteInfo" class="setup-card" style="display:none">
       <div style="font-size:12px; color:#8B8680">가족 초대 코드</div>
       <div class="code-row">
         <div class="code" id="inviteCodeText"></div>
         <button id="copyInviteBtn">복사</button>
       </div>
-      <div style="font-size:11px; color:#B2ADA6" id="inviteHint">가족의 폰에서 "초대 코드로 참여"에 이 코드를 입력하면 함께 쓸 수 있어요</div>
+      <div style="font-size:11px; color:#B2ADA6" id="inviteExpiryText"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="reissueInviteBtn" style="flex:1">새 코드 발급</button>
+        <button id="revokeInviteBtn" style="flex:1">초대 중지</button>
+      </div>
+      <div style="font-size:11px; color:#B2ADA6;margin-top:8px" id="inviteHint">가족의 폰에서 "초대 코드로 참여"에 이 코드를 입력하면 함께 쓸 수 있어요</div>
     </div>
-    <button id="setupSave">저장하기</button>
-    <button id="setupClose" style="display:none">닫기</button>
-    <button class="link-btn" id="logoutBtn2" style="display:none">로그아웃</button>
+    <div id="ownershipTransfer" class="setup-card" style="display:none">
+      <div class="settings-group-title">가족 소유권 이전</div>
+      <div class="settings-group-desc">소유권을 넘긴 뒤 현재 계정은 가족에서 탈퇴할 수 있어요.</div>
+      <div class="add-row">
+        <select id="ownershipSuccessor"></select>
+        <button id="transferOwnershipBtn">이전</button>
+      </div>
+    </div>
+    <div class="setup-card" id="familyActions" style="display:none">
+      <div class="settings-group-title">가족 관리</div>
+      <div class="settings-group-desc">가족 탈퇴 또는 가족 전체 데이터를 삭제하는 작업이에요.</div>
+      <button class="settings-action" id="leaveFamilyBtn" style="display:none">가족에서 탈퇴</button>
+      <button class="settings-action danger" id="deleteFamilyBtn" style="display:none">가족 삭제</button>
+    </div>
+    <div class="setup-card" id="accountActions" style="display:none">
+      <div class="settings-group-title">계정</div>
+      <div class="settings-group-desc">로그아웃해도 저장된 가족 데이터는 그대로 유지돼요.</div>
+      <button class="settings-action" id="logoutBtn2" style="display:none">로그아웃</button>
+      <div class="account-danger">
+        <button class="settings-action danger" id="deleteAccountBtn" style="display:none">계정 삭제</button>
+      </div>
+    </div>
     <div id="setupError"></div>
+    <div class="policy-links">
+      <a href="privacy.html" target="_blank" rel="noopener">개인정보처리방침</a>
+      <a href="terms.html" target="_blank" rel="noopener">이용약관</a>
+      <a href="delete-account.html" target="_blank" rel="noopener">계정 삭제 안내</a>
+      <a href="support.html" target="_blank" rel="noopener">문의</a>
+    </div>
   </div>
 </div>
 
@@ -614,20 +718,44 @@ function personOf(id) {
   return data.people[id];
 }
 
+function canManageFamily() {
+  return !fbMode || !!(uid && data && data.meta && data.meta.owner === uid);
+}
+
+function myMember() { return members().find(m => m.id === myMemberId) || null; }
+function canEditMember(member) {
+  const mine = myMember();
+  return !fbMode || canManageFamily() || !!(mine && (mine.id === member.id || (mine.role === "adult" && member.role === "child")));
+}
+function canRewardMember(member) {
+  const mine = myMember();
+  return member.role === "child" && (!fbMode || canManageFamily() || !!(mine && mine.role === "adult"));
+}
+function canEditPhonebook() {
+  const mine = myMember();
+  return !fbMode || canManageFamily() || !!(mine && mine.role === "adult");
+}
+
 /* ===== 저장소 (Firebase 또는 localStorage) ===== */
 const LS_KEY = "podoal-planner";
 let store = null;
-let db = null, dbMod = null, authMod = null, fbAuth = null;
+let db = null, dbMod = null, authMod = null, functionsMod = null, fbAuth = null, fbFunctions = null;
 let uid = null, familyId = null;
 let fbMode = false;
 let myMemberId = null;
 let identityApplied = false; // 접속 후 처음 한 번만 내 탭으로 이동
+let identityClaimBackfillAttempted = false;
+let roleSyncAttempted = false;
+let inviteMigrationAttempted = false;
+let familyUnsubscribe = null;
+let setupEditing = false; // 설정 화면 가족 정보 편집 모드
 
 function showScreen(name) {
   document.getElementById("authScreen").style.display = name === "auth" ? "flex" : "none";
   document.getElementById("startScreen").style.display = name === "start" ? "flex" : "none";
   document.getElementById("whoScreen").style.display = name === "who" ? "flex" : "none";
   if (name !== "setup") document.getElementById("setupScreen").style.display = "none";
+  document.getElementById("registerScreen").style.display = "none";
 }
 
 function setSync(text, on) {
@@ -642,9 +770,11 @@ async function initStore() {
       const appMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
       dbMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
       authMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+      functionsMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js");
       const app = appMod.initializeApp(window.FIREBASE_CONFIG);
       db = dbMod.getDatabase(app);
       fbAuth = authMod.getAuth(app);
+      fbFunctions = functionsMod.getFunctions(app, "asia-northeast3");
       fbMode = true;
       setSync("로그인 확인 중", false);
       authMod.onAuthStateChanged(fbAuth, async (user) => {
@@ -685,11 +815,12 @@ async function initStore() {
 
 function attachFamily() {
   const base = `families/${familyId}`;
+  if (familyUnsubscribe) familyUnsubscribe();
   store = {
-    write(path, value) { dbMod.set(dbMod.ref(db, `${base}/${path}`), value); },
+    write(path, value) { return dbMod.set(dbMod.ref(db, `${base}/${path}`), value); },
   };
   showScreen("app");
-  dbMod.onValue(dbMod.ref(db, base), (snap) => {
+  familyUnsubscribe = dbMod.onValue(dbMod.ref(db, base), (snap) => {
     const v = snap.val();
     data = normalize(v || JSON.parse(JSON.stringify(EMPTY_DATA)));
     setSync("실시간 공유 중", true);
@@ -703,6 +834,8 @@ function attachFamily() {
 }
 
 /* ===== 가족 만들기 / 초대 코드 참여 ===== */
+const INVITE_VALID_MS = 48 * 60 * 60 * 1000;
+
 // 헷갈리는 글자(O/0, I/1/L)를 뺀 초대 코드 생성
 async function genInviteCode() {
   const A = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
@@ -715,18 +848,55 @@ async function genInviteCode() {
   throw new Error("초대 코드 생성에 실패했어요");
 }
 
+async function ensureInviteMetadata() {
+  if (!fbMode || !canManageFamily() || inviteMigrationAttempted || !data.meta || !data.meta.inviteCode) return;
+  if (data.meta.inviteExpiresAt && typeof data.meta.inviteActive === "boolean") return;
+  inviteMigrationAttempted = true;
+  const expiresAt = Date.now() + INVITE_VALID_MS;
+  const code = data.meta.inviteCode;
+  await dbMod.update(dbMod.ref(db), {
+    [`families/${familyId}/meta/inviteExpiresAt`]: expiresAt,
+    [`families/${familyId}/meta/inviteActive`]: true,
+    [`invites/${code}`]: { familyId, expiresAt },
+  });
+}
+
+async function reissueInvite() {
+  if (!canManageFamily()) return;
+  const oldCode = data.meta && data.meta.inviteCode;
+  const code = await genInviteCode();
+  const expiresAt = Date.now() + INVITE_VALID_MS;
+  const updates = {
+    [`families/${familyId}/meta/inviteCode`]: code,
+    [`families/${familyId}/meta/inviteExpiresAt`]: expiresAt,
+    [`families/${familyId}/meta/inviteActive`]: true,
+    [`invites/${code}`]: { familyId, expiresAt },
+  };
+  if (oldCode && oldCode !== code) updates[`invites/${oldCode}`] = null;
+  await dbMod.update(dbMod.ref(db), updates);
+}
+
+async function revokeInvite() {
+  if (!canManageFamily()) return;
+  const code = data.meta && data.meta.inviteCode;
+  const updates = { [`families/${familyId}/meta/inviteActive`]: false };
+  if (code) updates[`invites/${code}`] = null;
+  await dbMod.update(dbMod.ref(db), updates);
+}
+
 async function createFamily() {
   const errBox = document.getElementById("startError");
   errBox.textContent = "";
   try {
     const code = await genInviteCode();
     const fid = dbMod.push(dbMod.ref(db, "families")).key;
+    const expiresAt = Date.now() + INVITE_VALID_MS;
     await dbMod.set(dbMod.ref(db, `families/${fid}`), {
-      meta: { inviteCode: code, owner: uid, createdAt: Date.now() },
+      meta: { inviteCode: code, inviteExpiresAt: expiresAt, inviteActive: true, owner: uid, createdAt: Date.now() },
       auth: { [uid]: code },
       family: { name: "", members: [] },
     });
-    await dbMod.set(dbMod.ref(db, `invites/${code}`), fid);
+    await dbMod.set(dbMod.ref(db, `invites/${code}`), { familyId: fid, expiresAt });
     await dbMod.set(dbMod.ref(db, `users/${uid}`), { familyId: fid });
     familyId = fid;
     attachFamily();
@@ -742,16 +912,20 @@ async function joinFamily() {
   const code = document.getElementById("joinCodeInput").value.replace(/[^0-9A-Za-z]/g, "").toUpperCase();
   if (code.length < 6) { errBox.textContent = "6자리 초대 코드를 입력해 주세요"; return; }
   try {
-    const snap = await dbMod.get(dbMod.ref(db, `invites/${code}`));
-    const fid = snap.val();
-    if (!fid) { errBox.textContent = "초대 코드를 찾을 수 없어요. 다시 확인해 주세요"; return; }
-    await dbMod.set(dbMod.ref(db, `families/${fid}/auth/${uid}`), code);
-    await dbMod.set(dbMod.ref(db, `users/${uid}`), { familyId: fid });
+    const callJoinFamily = functionsMod.httpsCallable(fbFunctions, "joinFamily");
+    const result = await callJoinFamily({ code });
+    const fid = result.data && result.data.familyId;
+    if (!fid) throw new Error("JOIN_RESPONSE_INVALID");
     familyId = fid;
     attachFamily();
   } catch (e) {
     console.error(e);
-    errBox.textContent = "참여하지 못했어요. 코드를 다시 확인해 주세요";
+    const message = e && e.message ? e.message : "";
+    errBox.textContent = /만료/.test(message)
+      ? "만료된 초대 코드예요. 가족 소유자에게 새 코드를 요청해 주세요"
+      : /이미 가족/.test(message)
+        ? "이미 다른 가족에 가입된 계정이에요"
+        : "참여하지 못했어요. 코드를 다시 확인해 주세요";
   }
 }
 
@@ -759,7 +933,18 @@ async function googleLogin() {
   const errBox = document.getElementById("authError");
   errBox.textContent = "";
   try {
-    await authMod.signInWithPopup(fbAuth, new authMod.GoogleAuthProvider());
+    if (window.Capacitor?.isNativePlatform?.()) {
+      const nativeAuth = window.Capacitor?.Plugins?.FirebaseAuthentication;
+      if (!nativeAuth) throw new Error("NATIVE_AUTH_UNAVAILABLE");
+      const result = await nativeAuth.signInWithGoogle();
+      const idToken = result?.credential?.idToken;
+      const accessToken = result?.credential?.accessToken;
+      if (!idToken) throw new Error("GOOGLE_ID_TOKEN_MISSING");
+      const credential = authMod.GoogleAuthProvider.credential(idToken, accessToken || null);
+      await authMod.signInWithCredential(fbAuth, credential);
+    } else {
+      await authMod.signInWithPopup(fbAuth, new authMod.GoogleAuthProvider());
+    }
   } catch (e) {
     console.error(e);
     errBox.textContent = "로그인에 실패했어요. 다시 시도해 주세요";
@@ -768,7 +953,87 @@ async function googleLogin() {
 
 async function logout() {
   if (fbAuth) await authMod.signOut(fbAuth);
+  if (window.Capacitor?.isNativePlatform?.()) {
+    await window.Capacitor?.Plugins?.FirebaseAuthentication?.signOut();
+  }
   location.reload();
+}
+
+function clearFamilySession() {
+  if (familyUnsubscribe) { familyUnsubscribe(); familyUnsubscribe = null; }
+  familyId = null;
+  myMemberId = null;
+  currentMemberId = null;
+  identityApplied = false;
+  identityClaimBackfillAttempted = false;
+  roleSyncAttempted = false;
+  data = null;
+  store = null;
+  setSync("가족을 만들거나 참여해 주세요", false);
+  showScreen("start");
+}
+
+async function leaveFamily(deleteFamily = false) {
+  const leaveBtn = document.getElementById("leaveFamilyBtn");
+  leaveBtn.disabled = true;
+  try {
+    const callLeaveFamily = functionsMod.httpsCallable(fbFunctions, "leaveFamily");
+    await callLeaveFamily({ deleteFamily });
+    clearFamilySession();
+  } catch (e) {
+    console.error("가족 탈퇴 실패:", e);
+    document.getElementById("setupError").textContent = /소유자/.test(e && e.message ? e.message : "")
+      ? "가족 소유자는 소유권을 이전한 뒤 탈퇴할 수 있어요"
+      : "가족에서 탈퇴하지 못했어요. 잠시 후 다시 시도해 주세요";
+  } finally {
+    leaveBtn.disabled = false;
+  }
+}
+
+async function transferOwnership() {
+  const successorUid = document.getElementById("ownershipSuccessor").value;
+  if (!successorUid) return;
+  try {
+    const callTransfer = functionsMod.httpsCallable(fbFunctions, "transferOwnership");
+    await callTransfer({ successorUid });
+    document.getElementById("setupError").textContent = "가족 소유권을 이전했어요. 이제 가족에서 탈퇴할 수 있어요";
+  } catch (e) {
+    console.error("소유권 이전 실패:", e);
+    document.getElementById("setupError").textContent = "소유권을 이전하지 못했어요. 연결된 어른인지 확인해 주세요";
+  }
+}
+
+async function deleteAccount() {
+  const button = document.getElementById("deleteAccountBtn");
+  button.disabled = true;
+  try {
+    const user = fbAuth.currentUser;
+    if (!user) throw new Error("AUTH_REQUIRED");
+    if (window.Capacitor?.isNativePlatform?.()) {
+      const nativeAuth = window.Capacitor?.Plugins?.FirebaseAuthentication;
+      if (!nativeAuth) throw new Error("NATIVE_AUTH_UNAVAILABLE");
+      const result = await nativeAuth.signInWithGoogle();
+      const idToken = result?.credential?.idToken;
+      const accessToken = result?.credential?.accessToken;
+      if (!idToken) throw new Error("GOOGLE_ID_TOKEN_MISSING");
+      const credential = authMod.GoogleAuthProvider.credential(idToken, accessToken || null);
+      await authMod.reauthenticateWithCredential(user, credential);
+    } else {
+      await authMod.reauthenticateWithPopup(user, new authMod.GoogleAuthProvider());
+    }
+    await user.getIdToken(true);
+    const callDeleteAccount = functionsMod.httpsCallable(fbFunctions, "deleteAccount");
+    await callDeleteAccount();
+    location.reload();
+  } catch (e) {
+    console.error("계정 삭제 실패:", e);
+    const message = e && e.message ? e.message : "";
+    document.getElementById("setupError").textContent = /소유권/.test(message)
+      ? "다른 어른에게 가족 소유권을 이전한 뒤 계정을 삭제해 주세요"
+      : "계정을 삭제하지 못했어요. Google 로그인 확인 후 다시 시도해 주세요";
+  } finally {
+    button.disabled = false;
+  }
 }
 
 // Firebase는 빈 객체/배열을 지우기 때문에 형태 보정
@@ -800,14 +1065,26 @@ function normalize(v) {
 /* ===== 렌더링 ===== */
 function render() {
   if (!data) return;
-  if (!members().length) { openSetup(false); return; }
-  document.getElementById("setupScreen").style.display = "none";
+  if (!members().length) { openRegister(); return; }
+  document.getElementById("registerScreen").style.display = "none";
   // Firebase 모드: 이 계정이 누구인지 아직 안 정했으면 선택 화면
   if (fbMode && uid) {
     myMemberId = (data.memberOf || {})[uid] || null;
     if (!myMemberId) { openWhoScreen(); return; }
+    if (!identityClaimBackfillAttempted && (!data.memberClaims || !data.memberClaims[myMemberId])) {
+      identityClaimBackfillAttempted = true;
+      dbMod.set(dbMod.ref(db, `families/${familyId}/memberClaims/${myMemberId}`), uid)
+        .catch(err => console.warn("기존 계정 연결 보호 정보 생성 실패:", err));
+    }
     document.getElementById("whoScreen").style.display = "none";
     if (!identityApplied) { currentMemberId = myMemberId; identityApplied = true; }
+  }
+  if (fbMode && canManageFamily() && !roleSyncAttempted) {
+    roleSyncAttempted = true;
+    const roles = Object.fromEntries(members().map(m => [m.id, m.role]));
+    if (JSON.stringify(data.memberRoles || {}) !== JSON.stringify(roles)) {
+      store.write("memberRoles", roles).catch(err => console.warn("구성원 역할 정보 저장 실패:", err));
+    }
   }
   if (!curMember()) currentMemberId = members()[0].id;
   else currentMemberId = curMember().id;
@@ -815,7 +1092,7 @@ function render() {
   document.getElementById("appTitle").textContent = data.family.name ? data.family.name : "포도알플래너";
   const m = curMember();
   document.getElementById("grapeCard").style.display = m.role === "child" ? "" : "none";
-  document.getElementById("commentCard").style.display = m.role === "adult" ? "" : "none";
+  document.getElementById("commentCard").style.display = m.role === "child" ? "" : "none";
   renderTabs();
   renderChecklist();
   renderSchedule();
@@ -890,6 +1167,8 @@ function itemsOf(p, dateStr) {
 function renderChecklist() {
   const m = curMember();
   if (m.role !== "child") return;
+  const canEdit = canEditMember(m);
+  if (!canEdit) editingItems = false;
   const p = personOf(m.id);
   const checks = (p.checks && p.checks[selectedDate]) || {};
   document.getElementById("curDate").textContent = fmtDate(selectedDate);
@@ -905,8 +1184,8 @@ function renderChecklist() {
     const li = document.createElement("li");
     li.className = checked ? "done" : "";
     li.innerHTML = `
-      <input type="checkbox" ${checked ? "checked" : ""}>
-      <input class="txt" maxlength="30" value="${escapeHtml(item.text)}">
+      <input type="checkbox" ${checked ? "checked" : ""} ${canEdit ? "" : "disabled"}>
+      <input class="txt" maxlength="30" value="${escapeHtml(item.text)}" ${canEdit ? "" : "disabled"}>
       ${editingItems ? `<button class="del">✕</button>` : ""}`;
     li.querySelector("input[type=checkbox]").addEventListener("change", (e) => {
       // 이미 포도알을 받은 날 체크를 해제하면 포도알 회수 확인
@@ -945,8 +1224,9 @@ function renderChecklist() {
   document.getElementById("progressLabel").textContent =
     total ? `${done} / ${total} 완료 (${pct}%)` : "항목을 추가해 주세요";
 
-  document.getElementById("itemAddRow").style.display = editingItems ? "flex" : "none";
+  document.getElementById("itemAddRow").style.display = canEdit && editingItems ? "flex" : "none";
   const btn = document.getElementById("editItemsBtn");
+  btn.style.display = canEdit ? "" : "none";
   btn.textContent = editingItems ? "완료" : "항목 편집";
   btn.classList.toggle("editing", editingItems);
   renderGrapes(done, total);
@@ -963,7 +1243,7 @@ function renderGrapes(done, total) {
     if (grapes[selectedDate]) {
       const v = grapeVariant(selectedDate);
       html += `<div class="grape-done">${fmtDate(selectedDate)} ${v === 4 ? "포도쥬스 당첨! 🧃" : "포도알 획득!"}</div>`;
-    } else {
+    } else if (canRewardMember(m)) {
       html += `<button class="grape-btn" id="giveGrapeBtn">다 했어요! 포도알 주세요</button>`;
     }
   }
@@ -1027,6 +1307,8 @@ function schedRows() {
 
 function renderSchedule() {
   const m = curMember();
+  const canEdit = canEditMember(m);
+  if (!canEdit) editingSched = false;
   const p = personOf(m.id);
   const sched = p.schedule[selectedDate] || [];
   document.getElementById("schedCurDate").textContent = fmtDate(selectedDate);
@@ -1040,10 +1322,10 @@ function renderSchedule() {
     li.dataset.end = item && item.end ? item.end : "";
     li.innerHTML = `
       <span class="s-time">
-        <input class="t-start" inputmode="numeric" maxlength="5" placeholder="시작시간" value="${escapeHtml(li.dataset.time)}">
-        <input class="t-end" inputmode="numeric" maxlength="5" placeholder="종료시간" value="${escapeHtml(li.dataset.end)}">
+        <input class="t-start" inputmode="numeric" maxlength="5" placeholder="시작시간" value="${escapeHtml(li.dataset.time)}" ${canEdit ? "" : "disabled"}>
+        <input class="t-end" inputmode="numeric" maxlength="5" placeholder="종료시간" value="${escapeHtml(li.dataset.end)}" ${canEdit ? "" : "disabled"}>
       </span>
-      <input class="s-text" maxlength="30" value="${item ? escapeHtml(item.text) : ""}">
+      <input class="s-text" maxlength="30" value="${item ? escapeHtml(item.text) : ""}" ${canEdit ? "" : "disabled"}>
       ${item && editingSched ? `<button class="del">✕</button>` : ""}`;
     const tStart = li.querySelector(".t-start"), tEnd = li.querySelector(".t-end");
     const syncTime = () => {
@@ -1068,6 +1350,7 @@ function renderSchedule() {
     ul.appendChild(li);
   }
   const sBtn = document.getElementById("editSchedBtn");
+  sBtn.style.display = canEdit ? "" : "none";
   sBtn.textContent = editingSched ? "완료" : "항목 편집";
   sBtn.classList.toggle("editing", editingSched);
   renderTimeline(sched, document.getElementById("schedTimeline"));
@@ -1076,6 +1359,7 @@ function renderSchedule() {
 // 왼쪽 표의 모든 줄을 읽어 계획표로 저장
 function saveScheduleFromRows() {
   const m = curMember();
+  if (!canEditMember(m)) return;
   const sched = [];
   for (const li of schedRows()) {
     const t = li.dataset.time;
@@ -1121,7 +1405,8 @@ function renderTimeline(schedule, tl) {
 let commentTabFor = null;
 function renderComments() {
   const m = curMember();
-  if (m.role !== "adult") return;
+  if (m.role !== "child") return;
+  const canReward = canRewardMember(m);
   const p = personOf(m.id);
   const box = document.getElementById("commentList");
   const arr = (p.comments || {})[selectedDate] || [];
@@ -1132,7 +1417,7 @@ function renderComments() {
       return `<li>
         <span style="background:${col.bg}; color:${col.fg}; border-radius:6px; padding:2px 8px; font-size:12px; font-weight:700; white-space:nowrap">${escapeHtml(c.who || "")}</span>
         <span style="font-size:14px">${escapeHtml(c.text)}</span>
-        <button class="del" data-i="${i}">✕</button></li>`;
+        ${canReward ? `<button class="del" data-i="${i}">✕</button>` : ""}</li>`;
     }).join("") + `</ul>`;
   } else {
     html += `<div class="evt-empty">${escapeHtml(m.name)}의 일정에 응원이나 부탁을 남겨보세요</div>`;
@@ -1146,6 +1431,8 @@ function renderComments() {
   });
   // 탭이 바뀌면 작성자 목록 갱신 — 기본값: 내 identity, 없으면 본인이 아닌 첫 구성원
   const sel = document.getElementById("commentWho");
+  const addRow = document.getElementById("commentText").parentElement;
+  addRow.style.display = canReward ? "flex" : "none";
   if (commentTabFor !== m.id || sel.options.length !== members().length) {
     commentTabFor = m.id;
     sel.innerHTML = members().map(mm => `<option>${escapeHtml(mm.name)}</option>`).join("");
@@ -1213,6 +1500,7 @@ function renderCalendar() {
 
 function renderCalMemo() {
   const m = curMember();
+  const canEdit = canEditMember(m);
   const box = document.getElementById("calMemo");
   const list = eventsOf(m.id, selectedDate);
   let html = `<div class="memo-title"><svg class="icon" style="width:13px;height:13px;vertical-align:-2px" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> ${fmtDate(selectedDate)} 메모</div>`;
@@ -1222,10 +1510,10 @@ function renderCalMemo() {
       return `
       <li>${e.time ? `<span class="evt-time" style="color:#3B3835">${escapeHtml(e.time)}</span>` : ""}
         <span style="background:${c.bg}; color:${c.fg}; border-radius:6px; padding:2px 8px">${escapeHtml(e.text)}</span>
-        <button class="del" data-i="${i}">✕</button></li>`;
+        ${canEdit ? `<button class="del" data-i="${i}">✕</button>` : ""}</li>`;
     }).join("") + `</ul>`;
   }
-  html += `<div class="add-row"><input id="calMemoText" placeholder="메모 입력 (예: 할머니 댁)" maxlength="40"><button id="calMemoAdd">추가</button></div>`;
+  if (canEdit) html += `<div class="add-row"><input id="calMemoText" placeholder="메모 입력 (예: 할머니 댁)" maxlength="40"><button id="calMemoAdd">추가</button></div>`;
   box.innerHTML = html;
   box.querySelectorAll(".del").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -1233,7 +1521,9 @@ function renderCalMemo() {
       store.write(`people/${m.id}/events/${selectedDate}`, arr.length ? arr : null);
     });
   });
-  document.getElementById("calMemoAdd").addEventListener("click", () => {
+  const memoAdd = document.getElementById("calMemoAdd");
+  if (!memoAdd) return;
+  memoAdd.addEventListener("click", () => {
     const input = document.getElementById("calMemoText");
     const text = input.value.trim();
     if (!text) return;
@@ -1255,6 +1545,8 @@ function shiftMonth(n) {
 /* ===== 전화번호부 ===== */
 function renderPhonebook() {
   const m = curMember();
+  const canEdit = canEditPhonebook();
+  if (!canEdit) editingPhone = false;
   const ul = document.getElementById("phoneList");
   const book = personOf(m.id).phonebook || [];
   ul.innerHTML = "";
@@ -1276,26 +1568,79 @@ function renderPhonebook() {
     }
     ul.appendChild(li);
   });
-  document.getElementById("phoneAddRow1").style.display = editingPhone ? "flex" : "none";
-  document.getElementById("phoneAddRow2").style.display = editingPhone ? "flex" : "none";
+  document.getElementById("phoneAddRow1").style.display = canEdit && editingPhone ? "flex" : "none";
+  document.getElementById("phoneAddRow2").style.display = canEdit && editingPhone ? "flex" : "none";
   const pBtn = document.getElementById("editPhoneBtn");
+  pBtn.style.display = canEdit ? "" : "none";
   pBtn.textContent = editingPhone ? "완료" : "항목 편집";
   pBtn.classList.toggle("editing", editingPhone);
 }
 
 /* ===== 누구인가요? (계정-구성원 연결) ===== */
-function openWhoScreen() {
+function openWhoScreen(errorMessage = "") {
   showScreen("who");
   const box = document.getElementById("whoButtons");
+  const errBox = document.getElementById("whoError");
   box.innerHTML = "";
+  errBox.textContent = errorMessage;
   members().forEach(m => {
+    const claimedBy = data.memberClaims && data.memberClaims[m.id];
     const b = document.createElement("button");
     b.className = "big-btn";
-    b.textContent = m.name + (m.role === "child" ? " (아이)" : "");
-    b.addEventListener("click", () => {
-      store.write(`memberOf/${uid}`, m.id);
-    });
+    b.textContent = m.name + (m.role === "child" ? " (아이)" : "") + (claimedBy && claimedBy !== uid ? " · 연결됨" : "");
+    b.disabled = !!(claimedBy && claimedBy !== uid);
+    b.addEventListener("click", () => claimIdentity(m.id));
     box.appendChild(b);
+  });
+}
+
+async function claimIdentity(memberId) {
+  const errBox = document.getElementById("whoError");
+  errBox.textContent = "";
+  const buttons = document.querySelectorAll("#whoButtons button");
+  buttons.forEach(b => { b.disabled = true; });
+  try {
+    if (canManageFamily()) {
+      await store.write(`memberClaims/${memberId}`, uid);
+      await store.write(`memberOf/${uid}`, memberId);
+    } else {
+      await store.write(`pendingClaims/${uid}`, memberId);
+      openWhoScreen("가족 소유자에게 연결 승인을 요청했어요");
+    }
+  } catch (e) {
+    console.error("계정과 구성원 연결 실패:", e);
+    const message = e && e.message === "MEMBER_ALREADY_CLAIMED"
+      ? "이미 다른 계정에 연결된 구성원이에요"
+      : "계정을 연결하지 못했어요. 잠시 후 다시 시도해 주세요";
+    openWhoScreen(message);
+  }
+}
+
+async function approveClaim(requestUid, memberId) {
+  try {
+    await store.write(`memberClaims/${memberId}`, requestUid);
+    await store.write(`memberOf/${requestUid}`, memberId);
+    await store.write(`pendingClaims/${requestUid}`, null);
+  } catch (e) {
+    console.error("구성원 연결 승인 실패:", e);
+    document.getElementById("setupError").textContent = "연결을 승인하지 못했어요. 이미 다른 계정에 연결됐는지 확인해 주세요";
+  }
+}
+
+function renderClaimRequests() {
+  const box = document.getElementById("claimRequests");
+  const requests = Object.entries((data && data.pendingClaims) || {});
+  if (!canManageFamily() || !requests.length) { box.style.display = "none"; box.innerHTML = ""; return; }
+  box.style.display = "block";
+  box.innerHTML = `<div style="font-size:13px;font-weight:800;margin-bottom:8px">구성원 연결 요청</div>`;
+  requests.forEach(([requestUid, memberId]) => {
+    const member = members().find(m => m.id === memberId);
+    const row = document.createElement("div");
+    row.className = "su-row";
+    row.innerHTML = `<div class="su-main"><span style="flex:1">${escapeHtml(member ? member.name : "삭제된 구성원")}</span><button class="approve">승인</button><button class="reject">거절</button></div>`;
+    row.querySelector(".approve").addEventListener("click", () => approveClaim(requestUid, memberId));
+    row.querySelector(".reject").addEventListener("click", () => store.write(`pendingClaims/${requestUid}`, null));
+    box.appendChild(row);
   });
 }
 
@@ -1306,6 +1651,7 @@ function makeMemberRow(m) {
   if (m && m.id) row.dataset.id = m.id;
   row.innerHTML = `
     <div class="su-main">
+      <span class="su-drag" title="길게 눌러 순서 이동">≡</span>
       <input class="su-name" placeholder="이름" maxlength="10" value="${m ? escapeHtml(m.name) : ""}">
       <select class="su-role">
         <option value="child">아이</option>
@@ -1316,29 +1662,129 @@ function makeMemberRow(m) {
   const roleSel = row.querySelector(".su-role");
   roleSel.value = m ? m.role : "child";
   row.querySelector(".su-del").addEventListener("click", () => row.remove());
+  attachRowDrag(row);
   return row;
 }
 
-function openSetup(closable) {
-  const screen = document.getElementById("setupScreen");
+// 편집 모드에서 핸들(≡)을 길게 누르면 행을 위아래로 끌어 순서 변경
+// (WebView에서 포인터 캡처가 동작하지 않아 드래그 중에는 document에서 추적)
+function attachRowDrag(row) {
+  const handle = row.querySelector(".su-drag");
+  let pressTimer = null;
+  const onMove = (e) => {
+    const box = row.parentElement;
+    if (!box) return;
+    let target = null;
+    for (const sib of box.querySelectorAll(".su-row")) {
+      if (sib === row) continue;
+      const rect = sib.getBoundingClientRect();
+      if (e.clientY < rect.top + rect.height / 2) { target = sib; break; }
+    }
+    if (target) box.insertBefore(row, target);
+    else box.appendChild(row);
+  };
+  const stop = () => {
+    if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+    row.classList.remove("dragging");
+    document.removeEventListener("pointermove", onMove);
+    document.removeEventListener("pointerup", stop);
+    document.removeEventListener("pointercancel", stop);
+  };
+  handle.addEventListener("contextmenu", e => e.preventDefault());
+  handle.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    pressTimer = setTimeout(() => {
+      pressTimer = null;
+      row.classList.add("dragging");
+      if (navigator.vibrate) navigator.vibrate(30);
+      document.addEventListener("pointermove", onMove);
+    }, 300);
+    document.addEventListener("pointerup", stop);
+    document.addEventListener("pointercancel", stop);
+  });
+}
+
+function openRegister() {
+  const screen = document.getElementById("registerScreen");
+  if (screen.style.display === "flex") return; // 입력 중 리렌더로 초기화 방지
+  const canManage = canManageFamily();
   screen.style.display = "flex";
-  document.getElementById("setupClose").style.display = closable ? "block" : "none";
-  document.getElementById("setupError").textContent = "";
-  // Firebase 모드면 초대 코드와 로그아웃 표시
-  const hasCode = fbMode && data && data.meta && data.meta.inviteCode;
-  document.getElementById("inviteInfo").style.display = hasCode ? "block" : "none";
-  if (hasCode) document.getElementById("inviteCodeText").textContent = data.meta.inviteCode;
+  screen.scrollTop = 0;
+  document.getElementById("regError").textContent = canManage ? "" : "가족 정보는 가족 소유자만 변경할 수 있어요";
+  const nameInput = document.getElementById("regFamilyName");
+  nameInput.value = (data && data.family && data.family.name) || "";
+  nameInput.disabled = !canManage;
+  const box = document.getElementById("regMembers");
+  box.innerHTML = "";
+  box.appendChild(makeMemberRow(null));
+  box.querySelectorAll("input, select, button").forEach(el => { el.disabled = !canManage; });
+  document.getElementById("regAddMember").style.display = canManage ? "block" : "none";
+  document.getElementById("regSave").style.display = canManage ? "block" : "none";
+}
+
+function applySetupEditState() {
+  const canManage = canManageFamily();
+  const editing = setupEditing && canManage;
+  document.getElementById("setupFamilyName").disabled = !editing;
+  const box = document.getElementById("setupMembers");
+  box.classList.toggle("editing", editing);
+  box.querySelectorAll("input, select").forEach(el => { el.disabled = !editing; });
+  box.querySelectorAll(".su-del").forEach(el => { el.style.display = editing ? "" : "none"; });
+  document.getElementById("setupAddMember").style.display = editing ? "block" : "none";
+  document.getElementById("setupSave").style.display = editing ? "block" : "none";
+  document.getElementById("setupEditBtn").style.display = canManage && !editing ? "block" : "none";
+}
+
+function openSetup() {
+  const screen = document.getElementById("setupScreen");
+  const canManage = canManageFamily();
+  setupEditing = false;
+  screen.style.display = "flex";
+  screen.scrollTop = 0;
+  document.getElementById("setupHomeBtn").style.display = "flex";
+  document.getElementById("setupError").textContent = canManage ? "" : "가족 정보는 가족 소유자만 변경할 수 있어요";
+  // Firebase 모드에서는 가족 소유자에게만 초대 코드를 표시
+  const hasInvitePanel = fbMode && canManage && data && data.meta && data.meta.inviteCode;
+  document.getElementById("inviteInfo").style.display = hasInvitePanel ? "block" : "none";
+  if (hasInvitePanel) {
+    ensureInviteMetadata().catch(err => console.error("기존 초대 코드 전환 실패:", err));
+    const active = data.meta.inviteActive !== false && data.meta.inviteExpiresAt > Date.now();
+    document.getElementById("inviteCodeText").textContent = active ? data.meta.inviteCode : "초대 중지됨";
+    document.getElementById("copyInviteBtn").style.display = active ? "" : "none";
+    document.getElementById("revokeInviteBtn").style.display = active ? "" : "none";
+    document.getElementById("inviteExpiryText").textContent = active
+      ? `${new Date(data.meta.inviteExpiresAt).toLocaleString("ko-KR")}까지 유효 · 발급 후 48시간`
+      : "만료되었거나 폐기된 코드예요. 새 코드를 발급해 주세요";
+  }
   document.getElementById("logoutBtn2").style.display = fbMode ? "block" : "none";
-  document.getElementById("setupFamilyName").value = (data && data.family && data.family.name) || "";
+  document.getElementById("leaveFamilyBtn").style.display = fbMode && !canManage ? "block" : "none";
+  document.getElementById("deleteAccountBtn").style.display = fbMode ? "block" : "none";
+  const linkedAccounts = Object.entries((data && data.memberOf) || {}).filter(([accountUid]) => accountUid !== uid);
+  const successorSelect = document.getElementById("ownershipSuccessor");
+  const eligibleAdults = linkedAccounts.map(([accountUid, memberId]) => ({ accountUid, member: members().find(m => m.id === memberId) }))
+    .filter(entry => entry.member && entry.member.role === "adult");
+  successorSelect.innerHTML = eligibleAdults.map(entry => `<option value="${escapeHtml(entry.accountUid)}">${escapeHtml(entry.member.name)}</option>`).join("");
+  document.getElementById("ownershipTransfer").style.display = fbMode && canManage && eligibleAdults.length ? "block" : "none";
+  document.getElementById("deleteFamilyBtn").style.display = fbMode && canManage && linkedAccounts.length === 0 ? "block" : "none";
+  document.getElementById("familyActions").style.display = fbMode && (!canManage || linkedAccounts.length === 0) ? "block" : "none";
+  document.getElementById("accountActions").style.display = fbMode ? "block" : "none";
+  const familyNameInput = document.getElementById("setupFamilyName");
+  familyNameInput.value = (data && data.family && data.family.name) || "";
   const box = document.getElementById("setupMembers");
   box.innerHTML = "";
   const list = members();
   if (list.length) list.forEach(m => box.appendChild(makeMemberRow(m)));
   else box.appendChild(makeMemberRow(null));
+  applySetupEditState();
+  renderClaimRequests();
 }
 
-function saveSetup() {
-  const rows = document.querySelectorAll("#setupMembers .su-row");
+function saveFamilyForm(nameInputId, membersBoxId, errorId) {
+  if (!canManageFamily()) {
+    document.getElementById(errorId).textContent = "가족 정보는 가족 소유자만 변경할 수 있어요";
+    return false;
+  }
+  const rows = document.querySelectorAll(`#${membersBoxId} .su-row`);
   const newMembers = [];
   let seq = 0;
   for (const row of rows) {
@@ -1352,14 +1798,28 @@ function saveSetup() {
     newMembers.push(member);
   }
   if (!newMembers.length) {
-    document.getElementById("setupError").textContent = "구성원을 한 명 이상 입력해 주세요";
-    return;
+    document.getElementById(errorId).textContent = "구성원을 한 명 이상 입력해 주세요";
+    return false;
   }
-  const name = document.getElementById("setupFamilyName").value.trim();
+  const name = document.getElementById(nameInputId).value.trim();
   store.write("family", { name, members: newMembers });
+  store.write("memberRoles", Object.fromEntries(newMembers.map(m => [m.id, m.role])));
   data = normalize(data); // people 노드 보정
-  document.getElementById("setupScreen").style.display = "none";
-  render();
+  return true;
+}
+
+function saveRegister() {
+  if (saveFamilyForm("regFamilyName", "regMembers", "regError")) {
+    document.getElementById("registerScreen").style.display = "none";
+    render();
+  }
+}
+
+function saveSetup() {
+  if (saveFamilyForm("setupFamilyName", "setupMembers", "setupError")) {
+    render();
+    openSetup(); // 보기 모드로 새로고침 (설정 화면 유지)
+  }
 }
 
 /* ===== 공통 ===== */
@@ -1376,22 +1836,42 @@ document.getElementById("schedNextDay").addEventListener("click", () => { select
 document.getElementById("schedGoToday").addEventListener("click", () => { selectedDate = todayStr(); render(); });
 document.getElementById("prevMonth").addEventListener("click", () => shiftMonth(-1));
 document.getElementById("nextMonth").addEventListener("click", () => shiftMonth(1));
-document.getElementById("editItemsBtn").addEventListener("click", () => { editingItems = !editingItems; render(); });
-document.getElementById("editSchedBtn").addEventListener("click", () => { editingSched = !editingSched; render(); });
-document.getElementById("editPhoneBtn").addEventListener("click", () => { editingPhone = !editingPhone; render(); });
-document.getElementById("settingsBtn").addEventListener("click", () => openSetup(true));
+document.getElementById("editItemsBtn").addEventListener("click", () => { if (canEditMember(curMember())) { editingItems = !editingItems; render(); } });
+document.getElementById("editSchedBtn").addEventListener("click", () => { if (canEditMember(curMember())) { editingSched = !editingSched; render(); } });
+document.getElementById("editPhoneBtn").addEventListener("click", () => { if (canEditPhonebook()) { editingPhone = !editingPhone; render(); } });
+document.getElementById("settingsBtn").addEventListener("click", () => openSetup());
 document.getElementById("googleLoginBtn").addEventListener("click", googleLogin);
 document.getElementById("createFamilyBtn").addEventListener("click", createFamily);
 document.getElementById("joinFamilyBtn").addEventListener("click", joinFamily);
 document.getElementById("joinCodeInput").addEventListener("keydown", e => { if (e.key === "Enter") joinFamily(); });
 document.getElementById("logoutBtn1").addEventListener("click", logout);
 document.getElementById("logoutBtn2").addEventListener("click", logout);
-document.getElementById("whoOpenSetup").addEventListener("click", () => openSetup(true));
+document.getElementById("leaveFamilyBtn").addEventListener("click", () => {
+  askConfirm("가족에서 탈퇴하면 이 가족의 일정과 정보를 더 이상 볼 수 없어요.", "탈퇴할게요", leaveFamily);
+});
+document.getElementById("deleteFamilyBtn").addEventListener("click", () => {
+  askConfirm("가족 구성원과 모든 일정·메모·전화번호가 영구적으로 삭제돼요. 이 작업은 되돌릴 수 없어요.", "가족 삭제", () => leaveFamily(true));
+});
+document.getElementById("transferOwnershipBtn").addEventListener("click", () => {
+  askConfirm("선택한 어른에게 가족 관리 권한을 넘길까요?", "소유권 이전", transferOwnership);
+});
+document.getElementById("deleteAccountBtn").addEventListener("click", () => {
+  askConfirm("계정과 가족 연결 정보가 영구적으로 삭제돼요. 계속하려면 Google 로그인을 다시 확인해야 해요.", "계정 삭제", deleteAccount);
+});
+document.getElementById("whoOpenSetup").addEventListener("click", () => openSetup());
 document.getElementById("setupAddMember").addEventListener("click", () => {
   document.getElementById("setupMembers").appendChild(makeMemberRow(null));
 });
 document.getElementById("setupSave").addEventListener("click", saveSetup);
-document.getElementById("setupClose").addEventListener("click", () => {
+document.getElementById("setupEditBtn").addEventListener("click", () => {
+  setupEditing = true;
+  applySetupEditState();
+});
+document.getElementById("regAddMember").addEventListener("click", () => {
+  document.getElementById("regMembers").appendChild(makeMemberRow(null));
+});
+document.getElementById("regSave").addEventListener("click", saveRegister);
+document.getElementById("setupHomeBtn").addEventListener("click", () => {
   document.getElementById("setupScreen").style.display = "none";
 });
 document.getElementById("copyInviteBtn").addEventListener("click", async () => {
@@ -1405,11 +1885,23 @@ document.getElementById("copyInviteBtn").addEventListener("click", async () => {
     hint.textContent = "복사가 안 되면 코드를 길게 눌러 직접 복사해 주세요";
   }
 });
+document.getElementById("reissueInviteBtn").addEventListener("click", async () => {
+  const hint = document.getElementById("inviteHint");
+  hint.textContent = "새 코드를 발급하는 중이에요";
+  try { await reissueInvite(); hint.textContent = "새 초대 코드가 발급됐어요. 이전 코드는 사용할 수 없어요"; }
+  catch (e) { console.error(e); hint.textContent = "새 코드를 발급하지 못했어요. 잠시 후 다시 시도해 주세요"; }
+});
+document.getElementById("revokeInviteBtn").addEventListener("click", async () => {
+  const hint = document.getElementById("inviteHint");
+  try { await revokeInvite(); hint.textContent = "초대를 중지했어요. 이 코드는 더 이상 사용할 수 없어요"; }
+  catch (e) { console.error(e); hint.textContent = "초대를 중지하지 못했어요. 잠시 후 다시 시도해 주세요"; }
+});
 document.getElementById("addItemBtn").addEventListener("click", () => {
   const input = document.getElementById("newItemText");
   const text = input.value.trim();
   if (!text) return;
   const m = curMember();
+  if (!canEditMember(m)) return;
   const items = [...itemsOf(personOf(m.id), selectedDate), { id: "i" + Date.now(), text }];
   input.value = "";
   store.write(`people/${m.id}/items/${selectedDate}`, items);
@@ -1419,6 +1911,7 @@ document.getElementById("commentAdd").addEventListener("click", () => {
   const text = input.value.trim();
   if (!text) return;
   const m = curMember();
+  if (!canRewardMember(m)) return;
   const who = document.getElementById("commentWho").value;
   const arr = (personOf(m.id).comments || {})[selectedDate] || [];
   input.value = "";
@@ -1433,6 +1926,7 @@ document.getElementById("addPhoneBtn").addEventListener("click", () => {
   const name = nameIn.value.trim(), phone = numIn.value.trim();
   if (!name || !phone) return;
   const m = curMember();
+  if (!canEditPhonebook()) return;
   nameIn.value = ""; numIn.value = "";
   store.write(`people/${m.id}/phonebook`, [...(personOf(m.id).phonebook || []), { name, phone }]);
 });
@@ -1441,6 +1935,8 @@ document.getElementById("todayLabel").textContent = "오늘은 " + fmtDate(today
 
 /* ===== 인앱 브라우저 감지 (구글 로그인이 차단되므로 외부 브라우저로 유도) ===== */
 function detectInApp() {
+  // Capacitor Android 앱의 WebView는 일반 인앱 브라우저가 아니므로 차단하지 않는다.
+  if (window.Capacitor?.isNativePlatform?.()) return null;
   const ua = navigator.userAgent;
   if (/KAKAOTALK/i.test(ua)) return "kakao";
   if (/\bLine\//i.test(ua)) return "line";
