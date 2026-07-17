@@ -249,7 +249,12 @@
   #inviteInfo {
     margin-top: 14px; background: #F7F3EC; border-radius: 12px; padding: 12px; text-align: center;
   }
-  #inviteInfo .code { font-size: 22px; font-weight: 800; letter-spacing: 3px; margin: 4px 0; }
+  #inviteInfo .code { font-size: 22px; font-weight: 800; letter-spacing: 3px; }
+  #inviteInfo .code-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0; }
+  #copyInviteBtn {
+    border: none; background: #8E62AC; color: #fff; border-radius: 10px;
+    padding: 7px 14px; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit;
+  }
   #setupScreen {
     position: fixed; inset: 0; z-index: 100; background: #F5F3F0;
     display: flex; align-items: flex-start; justify-content: center;
@@ -462,8 +467,11 @@
     <button id="setupAddMember">+ 구성원 추가</button>
     <div id="inviteInfo" style="display:none">
       <div style="font-size:12px; color:#8B8680">가족 초대 코드</div>
-      <div class="code" id="inviteCodeText"></div>
-      <div style="font-size:11px; color:#B2ADA6">가족의 폰에서 "초대 코드로 참여"에 이 코드를 입력하면 함께 쓸 수 있어요</div>
+      <div class="code-row">
+        <div class="code" id="inviteCodeText"></div>
+        <button id="copyInviteBtn">복사</button>
+      </div>
+      <div style="font-size:11px; color:#B2ADA6" id="inviteHint">가족의 폰에서 "초대 코드로 참여"에 이 코드를 입력하면 함께 쓸 수 있어요</div>
     </div>
     <button id="setupSave">저장하기</button>
     <button id="setupClose" style="display:none">닫기</button>
@@ -1385,6 +1393,17 @@ document.getElementById("setupAddMember").addEventListener("click", () => {
 document.getElementById("setupSave").addEventListener("click", saveSetup);
 document.getElementById("setupClose").addEventListener("click", () => {
   document.getElementById("setupScreen").style.display = "none";
+});
+document.getElementById("copyInviteBtn").addEventListener("click", async () => {
+  const code = document.getElementById("inviteCodeText").textContent.trim();
+  if (!code) return;
+  const hint = document.getElementById("inviteHint");
+  try {
+    await navigator.clipboard.writeText(code);
+    hint.textContent = "복사됐어요! 가족에게 붙여넣어 보내주세요";
+  } catch (e) {
+    hint.textContent = "복사가 안 되면 코드를 길게 눌러 직접 복사해 주세요";
+  }
 });
 document.getElementById("addItemBtn").addEventListener("click", () => {
   const input = document.getElementById("newItemText");
