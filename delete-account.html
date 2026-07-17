@@ -17,10 +17,17 @@
     .button { display: block; margin: 18px 0; padding: 13px 16px; border-radius: 12px; background: #704A88; color: white; text-align: center; text-decoration: none; font-weight: 800; }
     .notice { padding: 14px; border-radius: 12px; background: #F2EBF7; }
     a { color: #704A88; font-weight: 700; }
+    .back-btn {
+      display: inline-flex; align-items: center; margin: 0 0 14px;
+      border: 1px solid #E0DAD2; background: #FFFEFC; color: #5F5952;
+      border-radius: 12px; padding: 9px 16px; font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+    }
   </style>
 </head>
 <body>
 <main>
+  <button class="back-btn" type="button" onclick="if (history.length > 1) history.back(); else location.href = 'index.html';">← 이전 페이지로</button>
   <article>
     <h1>포도알플래너 계정 삭제</h1>
     <p>포도알플래너 계정과 관련 데이터는 앱 안에서 직접 삭제하거나 이메일로 삭제를 요청할 수 있습니다.</p>

@@ -15,10 +15,17 @@
     p, li { font-size: 14px; }
     .button { display: block; margin: 18px 0; padding: 13px 16px; border-radius: 12px; background: #704A88; color: white; text-align: center; text-decoration: none; font-weight: 800; }
     a { color: #704A88; font-weight: 700; }
+    .back-btn {
+      display: inline-flex; align-items: center; margin: 0 0 14px;
+      border: 1px solid #E0DAD2; background: #FFFEFC; color: #5F5952;
+      border-radius: 12px; padding: 9px 16px; font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+    }
   </style>
 </head>
 <body>
 <main>
+  <button class="back-btn" type="button" onclick="if (history.length > 1) history.back(); else location.href = 'index.html';">← 이전 페이지로</button>
   <article>
     <h1>포도알플래너 도움말 및 문의</h1>
     <p>앱 이용, 가족 연결, 개인정보 또는 계정 삭제에 관한 문의를 받을 수 있습니다.</p>

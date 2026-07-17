@@ -749,6 +749,7 @@ let roleSyncAttempted = false;
 let inviteMigrationAttempted = false;
 let familyUnsubscribe = null;
 let setupEditing = false; // 설정 화면 가족 정보 편집 모드
+let settingsReopenChecked = false; // 약관 페이지에서 돌아왔을 때 설정 화면 복원용
 
 function showScreen(name) {
   document.getElementById("authScreen").style.display = name === "auth" ? "flex" : "none";
@@ -1100,6 +1101,16 @@ function render() {
   renderCalendar();
   renderCalMemo();
   renderPhonebook();
+  // 설정 화면에서 약관 페이지로 갔다가 돌아온 경우 설정 화면 복원
+  if (!settingsReopenChecked) {
+    settingsReopenChecked = true;
+    let backToSettings = null;
+    try {
+      backToSettings = sessionStorage.getItem("returnToSettings");
+      sessionStorage.removeItem("returnToSettings");
+    } catch (_) {}
+    if (backToSettings) openSetup();
+  }
 }
 
 const TAB_AVATARS = {
@@ -1871,6 +1882,12 @@ document.getElementById("regAddMember").addEventListener("click", () => {
   document.getElementById("regMembers").appendChild(makeMemberRow(null));
 });
 document.getElementById("regSave").addEventListener("click", saveRegister);
+// 설정 화면의 약관 링크: 돌아왔을 때 설정 화면을 다시 열도록 표시
+document.querySelectorAll("#setupScreen .policy-links a").forEach(a => {
+  a.addEventListener("click", () => {
+    try { sessionStorage.setItem("returnToSettings", "1"); } catch (_) {}
+  });
+});
 document.getElementById("setupHomeBtn").addEventListener("click", () => {
   document.getElementById("setupScreen").style.display = "none";
 });

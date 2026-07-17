@@ -17,10 +17,17 @@
     .date { color: #77716B; font-size: 13px; }
     .notice { padding: 14px; border-radius: 12px; background: #F2EBF7; }
     a { color: #704A88; font-weight: 700; }
+    .back-btn {
+      display: inline-flex; align-items: center; margin: 0 0 14px;
+      border: 1px solid #E0DAD2; background: #FFFEFC; color: #5F5952;
+      border-radius: 12px; padding: 9px 16px; font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+    }
   </style>
 </head>
 <body>
 <main>
+  <button class="back-btn" type="button" onclick="if (history.length > 1) history.back(); else location.href = 'index.html';">← 이전 페이지로</button>
   <article>
     <h1>포도알플래너 개인정보처리방침</h1>
     <p class="date">시행일: 2026년 7월 17일</p>
