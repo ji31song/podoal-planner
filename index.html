@@ -1445,13 +1445,17 @@ function renderComments() {
       store.write(`people/${m.id}/comments/${selectedDate}`, next.length ? next : null);
     });
   });
-  // 탭이 바뀌면 작성자 목록 갱신 — 기본값: 내 identity, 없으면 본인이 아닌 첫 구성원
+  // 작성자 목록은 항상 최신 구성원 이름으로 재구성 (이름 변경 반영), 선택 상태는 유지
   const sel = document.getElementById("commentWho");
   const addRow = document.getElementById("commentText").parentElement;
   addRow.style.display = canComment ? "flex" : "none";
-  if (commentTabFor !== m.id || sel.options.length !== members().length) {
+  const prevWho = sel.value;
+  sel.innerHTML = members().map(mm => `<option>${escapeHtml(mm.name)}</option>`).join("");
+  if (commentTabFor === m.id && members().some(mm => mm.name === prevWho)) {
+    sel.value = prevWho;
+  } else {
+    // 탭이 바뀌었거나 기존 선택이 사라짐 — 기본값: 내 identity, 없으면 본인이 아닌 첫 구성원
     commentTabFor = m.id;
-    sel.innerHTML = members().map(mm => `<option>${escapeHtml(mm.name)}</option>`).join("");
     const mine = members().find(mm => mm.id === myMemberId);
     const other = members().find(mm => mm.id !== m.id);
     if (mine) sel.value = mine.name;
