@@ -282,11 +282,6 @@
     border: none; background: #FDE8E8; color: #D64545; border-radius: 8px;
     width: 28px; height: 28px; font-size: 13px; cursor: pointer; flex-shrink: 0;
   }
-  .su-dates { display: flex; gap: 6px; align-items: center; margin-top: 8px; font-size: 12px; color: #6B6661; flex-wrap: wrap; }
-  .su-dates input[type=date] {
-    border: 1.5px solid #DBD7D1; border-radius: 8px; padding: 6px; font-size: 12px;
-    background: #FCFBFA; font-family: inherit;
-  }
   #setupAddMember {
     display: block; width: 100%; margin-top: 10px; border: 1.5px dashed #C9C4BC;
     background: #FCFBFA; color: #6B6661; border-radius: 12px; padding: 10px;
@@ -1170,15 +1165,7 @@ function renderCalendar() {
   const daysInMonth = new Date(year, month, 0).getDate();
   const monthFirst = `${year}-${String(month).padStart(2,"0")}-01`;
   const monthLast = `${year}-${String(month).padStart(2,"0")}-${String(daysInMonth).padStart(2,"0")}`;
-  const hasVac = m.role === "child" && m.vacStart && m.schoolStart;
-  const vacEnd = hasVac ? shiftDate(m.schoolStart, -1) : "";
-  if (hasVac && m.vacStart <= monthLast && vacEnd >= monthFirst) {
-    const vs = parseDate(m.vacStart), ve = parseDate(vacEnd);
-    legend.innerHTML = `<span><i class="bar" style="height:10px"></i>${escapeHtml(m.name)} 방학 (${vs.getMonth()+1}/${vs.getDate()} ~ ${ve.getMonth()+1}/${ve.getDate()})</span>`;
-    legend.style.display = "flex";
-  } else {
-    legend.style.display = "none";
-  }
+  legend.style.display = "none";
 
   const first = new Date(year, month-1, 1);
   const startOffset = first.getDay();
@@ -1191,7 +1178,7 @@ function renderCalendar() {
     const d = new Date(year, month-1, c - startOffset + 1);
     const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
     const inMonth = d.getMonth() === month - 1;
-    const bars = (hasVac && ds >= m.vacStart && ds < m.schoolStart) ? `<div class="bar"></div>` : "";
+    const bars = "";
     const evts = eventsOf(m.id, ds);
     let chips = evts.slice(0, 2).map(e => {
       const c2 = evtColor(e.text);
@@ -1317,17 +1304,9 @@ function makeMemberRow(m) {
         <option value="adult">어른</option>
       </select>
       <button class="su-del">✕</button>
-    </div>
-    <div class="su-dates">
-      방학 <input type="date" class="su-vac" value="${m && m.vacStart ? m.vacStart : ""}">
-      ~ 개학 <input type="date" class="su-school" value="${m && m.schoolStart ? m.schoolStart : ""}">
     </div>`;
   const roleSel = row.querySelector(".su-role");
   roleSel.value = m ? m.role : "child";
-  const datesDiv = row.querySelector(".su-dates");
-  const toggleDates = () => { datesDiv.style.display = roleSel.value === "child" ? "flex" : "none"; };
-  roleSel.addEventListener("change", toggleDates);
-  toggleDates();
   row.querySelector(".su-del").addEventListener("click", () => row.remove());
   return row;
 }
@@ -1362,11 +1341,6 @@ function saveSetup() {
       id: row.dataset.id || `m${Date.now()}${seq++}`,
       name, role,
     };
-    if (role === "child") {
-      const vac = row.querySelector(".su-vac").value;
-      const school = row.querySelector(".su-school").value;
-      if (vac && school && school > vac) { member.vacStart = vac; member.schoolStart = school; }
-    }
     newMembers.push(member);
   }
   if (!newMembers.length) {
