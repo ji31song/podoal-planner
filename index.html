@@ -731,6 +731,11 @@ function canRewardMember(member) {
   const mine = myMember();
   return member.role === "child" && (!fbMode || canManageFamily() || !!(mine && mine.role === "adult"));
 }
+function canCommentMember(member) {
+  // 한마디는 어른 탭에만 있고, 가족 구성원 누구나 남길 수 있다
+  const mine = myMember();
+  return member.role !== "child" && (!fbMode || canManageFamily() || !!mine);
+}
 function canEditPhonebook() {
   const mine = myMember();
   return !fbMode || canManageFamily() || !!(mine && mine.role === "adult");
@@ -1093,7 +1098,7 @@ function render() {
   document.getElementById("appTitle").textContent = data.family.name ? data.family.name : "포도알플래너";
   const m = curMember();
   document.getElementById("grapeCard").style.display = m.role === "child" ? "" : "none";
-  document.getElementById("commentCard").style.display = m.role === "child" ? "" : "none";
+  document.getElementById("commentCard").style.display = m.role === "child" ? "none" : "";
   renderTabs();
   renderChecklist();
   renderSchedule();
@@ -1416,8 +1421,8 @@ function renderTimeline(schedule, tl) {
 let commentTabFor = null;
 function renderComments() {
   const m = curMember();
-  if (m.role !== "child") return;
-  const canReward = canRewardMember(m);
+  if (m.role === "child") return;
+  const canComment = canCommentMember(m);
   const p = personOf(m.id);
   const box = document.getElementById("commentList");
   const arr = (p.comments || {})[selectedDate] || [];
@@ -1428,10 +1433,10 @@ function renderComments() {
       return `<li>
         <span style="background:${col.bg}; color:${col.fg}; border-radius:6px; padding:2px 8px; font-size:12px; font-weight:700; white-space:nowrap">${escapeHtml(c.who || "")}</span>
         <span style="font-size:14px">${escapeHtml(c.text)}</span>
-        ${canReward ? `<button class="del" data-i="${i}">✕</button>` : ""}</li>`;
+        ${canComment ? `<button class="del" data-i="${i}">✕</button>` : ""}</li>`;
     }).join("") + `</ul>`;
   } else {
-    html += `<div class="evt-empty">${escapeHtml(m.name)}의 일정에 응원이나 부탁을 남겨보세요</div>`;
+    html += `<div class="evt-empty">${escapeHtml(m.name)}에게 응원이나 부탁을 남겨보세요</div>`;
   }
   box.innerHTML = html;
   box.querySelectorAll(".del").forEach(btn => {
@@ -1443,7 +1448,7 @@ function renderComments() {
   // 탭이 바뀌면 작성자 목록 갱신 — 기본값: 내 identity, 없으면 본인이 아닌 첫 구성원
   const sel = document.getElementById("commentWho");
   const addRow = document.getElementById("commentText").parentElement;
-  addRow.style.display = canReward ? "flex" : "none";
+  addRow.style.display = canComment ? "flex" : "none";
   if (commentTabFor !== m.id || sel.options.length !== members().length) {
     commentTabFor = m.id;
     sel.innerHTML = members().map(mm => `<option>${escapeHtml(mm.name)}</option>`).join("");
@@ -1928,7 +1933,7 @@ document.getElementById("commentAdd").addEventListener("click", () => {
   const text = input.value.trim();
   if (!text) return;
   const m = curMember();
-  if (!canRewardMember(m)) return;
+  if (!canCommentMember(m)) return;
   const who = document.getElementById("commentWho").value;
   const arr = (personOf(m.id).comments || {})[selectedDate] || [];
   input.value = "";

@@ -139,12 +139,17 @@ describe("역할별 일정과 체크리스트 권한", () => {
 });
 
 describe("보상·댓글·전화번호부 권한", () => {
-  test("어른은 아이에게 포도알과 댓글을 줄 수 있다", async () => {
+  test("어른은 아이에게 포도알을 줄 수 있다", async () => {
     await assertSucceeds(set(ref(db("adultA"), "families/familyA/people/childMember/grapes/2026-07-17"), true));
-    await assertSucceeds(set(ref(db("adultA"), "families/familyA/people/childMember/comments/2026-07-17"), [{ who: "어른", text: "잘했어" }]));
   });
 
-  test("아이는 포도알·댓글·전화번호부를 수정할 수 없다", async () => {
+  test("한마디는 어른 탭에만 남길 수 있다", async () => {
+    await assertSucceeds(set(ref(db("childA"), "families/familyA/people/adultMember/comments/2026-07-17"), [{ who: "아이", text: "힘내세요" }]));
+    await assertSucceeds(set(ref(db("adultA"), "families/familyA/people/ownerMember/comments/2026-07-17"), [{ who: "어른", text: "고마워요" }]));
+    await assertFails(set(ref(db("adultA"), "families/familyA/people/childMember/comments/2026-07-17"), [{ who: "어른", text: "잘했어" }]));
+  });
+
+  test("아이는 포도알·전화번호부를 수정할 수 없다", async () => {
     await assertFails(set(ref(db("childA"), "families/familyA/people/childMember/grapes/2026-07-17"), true));
     await assertFails(set(ref(db("childA"), "families/familyA/people/childMember/comments/2026-07-17"), [{ who: "아이", text: "변조" }]));
     await assertFails(set(ref(db("childA"), "families/familyA/people/childMember/phonebook"), []));
