@@ -258,7 +258,7 @@
   #setupScreen, #registerScreen {
     position: fixed; inset: 0; z-index: 100; background: #F5F3F0;
     display: flex; align-items: flex-start; justify-content: center;
-    padding: calc(env(safe-area-inset-top, 0px) + 48px) 16px 24px;
+    padding: calc(env(safe-area-inset-top, 0px) + 48px) 16px calc(env(safe-area-inset-bottom, 0px) + 80px);
     overflow-y: auto;
   }
   .setup-card {
