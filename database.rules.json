@@ -3,7 +3,11 @@
     "invites": {
       "$code": {
         ".read": "auth != null",
-        ".write": "auth != null && !data.exists() && newData.exists()"
+        ".write": "auth != null && ((!data.exists() && newData.child('familyId').isString() && root.child('families').child(newData.child('familyId').val()).child('meta').child('owner').val() === auth.uid) || (data.child('familyId').isString() && root.child('families').child(data.child('familyId').val()).child('meta').child('owner').val() === auth.uid) || (data.isString() && root.child('families').child(data.val()).child('meta').child('owner').val() === auth.uid))",
+        ".validate": "newData.hasChildren(['familyId', 'expiresAt'])",
+        "familyId": { ".validate": "newData.isString()" },
+        "expiresAt": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
       }
     },
     "users": {
@@ -15,10 +19,45 @@
     "families": {
       "$fid": {
         ".read": "auth != null && data.child('auth').child(auth.uid).exists()",
-        ".write": "auth != null && (data.child('auth').child(auth.uid).exists() || !data.exists())",
+        ".write": "auth != null && !data.exists() && newData.child('meta').child('owner').val() === auth.uid && newData.child('meta').child('inviteCode').isString() && newData.child('meta').child('inviteExpiresAt').isNumber() && newData.child('meta').child('inviteActive').val() === true && newData.child('auth').child(auth.uid).val() === newData.child('meta').child('inviteCode').val()",
+        "meta": {
+          ".write": "auth != null && data.child('owner').val() === auth.uid && newData.exists() && newData.child('owner').val() === data.child('owner').val() && newData.child('inviteCode').isString() && newData.child('inviteExpiresAt').isNumber() && newData.child('inviteActive').isBoolean()"
+        },
         "auth": {
           "$uid": {
-            ".write": "auth != null && auth.uid === $uid && newData.val() === root.child('families').child($fid).child('meta').child('inviteCode').val()"
+            ".write": "auth != null && root.child('families').child($fid).child('meta').child('owner').val() === auth.uid && $uid !== auth.uid && (!newData.exists() || newData.val() === root.child('families').child($fid).child('meta').child('inviteCode').val())"
+          }
+        },
+        "family": {
+          ".write": "auth != null && data.parent().child('meta').child('owner').val() === auth.uid && data.parent().child('auth').child(auth.uid).exists() && newData.exists()"
+        },
+        "memberRoles": {
+          ".write": "auth != null && data.parent().child('meta').child('owner').val() === auth.uid && newData.exists()"
+        },
+        "people": {
+          "$mid": {
+            "items": { ".write": "auth != null && (root.child('families').child($fid).child('meta').child('owner').val() === auth.uid || root.child('families').child($fid).child('memberOf').child(auth.uid).val() === $mid || (root.child('families').child($fid).child('memberRoles').child(root.child('families').child($fid).child('memberOf').child(auth.uid).val()).val() === 'adult' && root.child('families').child($fid).child('memberRoles').child($mid).val() === 'child'))" },
+            "schedule": { ".write": "auth != null && (root.child('families').child($fid).child('meta').child('owner').val() === auth.uid || root.child('families').child($fid).child('memberOf').child(auth.uid).val() === $mid || (root.child('families').child($fid).child('memberRoles').child(root.child('families').child($fid).child('memberOf').child(auth.uid).val()).val() === 'adult' && root.child('families').child($fid).child('memberRoles').child($mid).val() === 'child'))" },
+            "checks": { ".write": "auth != null && (root.child('families').child($fid).child('meta').child('owner').val() === auth.uid || root.child('families').child($fid).child('memberOf').child(auth.uid).val() === $mid || (root.child('families').child($fid).child('memberRoles').child(root.child('families').child($fid).child('memberOf').child(auth.uid).val()).val() === 'adult' && root.child('families').child($fid).child('memberRoles').child($mid).val() === 'child'))" },
+            "events": { ".write": "auth != null && (root.child('families').child($fid).child('meta').child('owner').val() === auth.uid || root.child('families').child($fid).child('memberOf').child(auth.uid).val() === $mid || (root.child('families').child($fid).child('memberRoles').child(root.child('families').child($fid).child('memberOf').child(auth.uid).val()).val() === 'adult' && root.child('families').child($fid).child('memberRoles').child($mid).val() === 'child'))" },
+            "grapes": { ".write": "auth != null && (root.child('families').child($fid).child('meta').child('owner').val() === auth.uid || (root.child('families').child($fid).child('memberRoles').child(root.child('families').child($fid).child('memberOf').child(auth.uid).val()).val() === 'adult' && root.child('families').child($fid).child('memberRoles').child($mid).val() === 'child'))" },
+            "comments": { ".write": "auth != null && (root.child('families').child($fid).child('meta').child('owner').val() === auth.uid || (root.child('families').child($fid).child('memberRoles').child(root.child('families').child($fid).child('memberOf').child(auth.uid).val()).val() === 'adult' && root.child('families').child($fid).child('memberRoles').child($mid).val() === 'child'))" },
+            "phonebook": { ".write": "auth != null && (root.child('families').child($fid).child('meta').child('owner').val() === auth.uid || root.child('families').child($fid).child('memberRoles').child(root.child('families').child($fid).child('memberOf').child(auth.uid).val()).val() === 'adult')" }
+          }
+        },
+        "memberClaims": {
+          "$mid": {
+            ".write": "auth != null && !data.exists() && newData.isString() && (root.child('families').child($fid).child('meta').child('owner').val() === auth.uid || (newData.val() === auth.uid && root.child('families').child($fid).child('memberOf').child(auth.uid).val() === $mid))"
+          }
+        },
+        "memberOf": {
+          "$uid": {
+            ".write": "auth != null && root.child('families').child($fid).child('meta').child('owner').val() === auth.uid && !data.exists() && newData.isString() && data.parent().parent().child('memberClaims').child(newData.val()).val() === $uid"
+          }
+        },
+        "pendingClaims": {
+          "$uid": {
+            ".write": "auth != null && ((auth.uid === $uid && !root.child('families').child($fid).child('memberOf').child(auth.uid).exists() && (newData.isString() || !newData.exists())) || (root.child('families').child($fid).child('meta').child('owner').val() === auth.uid && !newData.exists()))"
           }
         }
       }

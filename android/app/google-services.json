@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "287832573418",
+    "firebase_url": "https://podoal-planner-c1d1e-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "podoal-planner-c1d1e",
+    "storage_bucket": "podoal-planner-c1d1e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:287832573418:android:18fa5d9f7088ea165d1e93",
+        "android_client_info": {
+          "package_name": "com.jisong.podoalplanner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "287832573418-033a5arbei1j2snjn97qfm6ak4t6asm5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jisong.podoalplanner",
+            "certificate_hash": "cc4933ebab159c412e33be4f02defc93be81e860"
+          }
+        },
+        {
+          "client_id": "287832573418-inta7bo2ee3v9lkn9jvdgjqfij69nmg1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlp1GV5rdYJJxH-CZh5VLWU4qOsiRPA1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "287832573418-inta7bo2ee3v9lkn9jvdgjqfij69nmg1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

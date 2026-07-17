@@ -1,1 +1,6 @@
 *.png
+node_modules/
+.tools/
+www/
+firebase-debug.log
+database-debug.log

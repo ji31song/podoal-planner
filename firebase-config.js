@@ -1,10 +1,10 @@
-// Firebase 설정 — podoal-planner 프로젝트
+// Firebase 설정 — 새 podoal-planner 프로젝트
 window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBz_rxpKRfEO7PUdnj2LZldsfLENN3utow",
-  authDomain: "podoal-planner.firebaseapp.com",
-  databaseURL: "https://podoal-planner-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "podoal-planner",
-  storageBucket: "podoal-planner.firebasestorage.app",
-  messagingSenderId: "189759693310",
-  appId: "1:189759693310:web:a04055046513cb3ab0a0af",
+  apiKey: "AIzaSyDlp1GV5rdYJJxH-CZh5VLWU4qOsiRPA1I",
+  authDomain: "podoal-planner-c1d1e.firebaseapp.com",
+  databaseURL: "https://podoal-planner-c1d1e-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "podoal-planner-c1d1e",
+  storageBucket: "podoal-planner-c1d1e.firebasestorage.app",
+  messagingSenderId: "287832573418",
+  appId: "1:287832573418:web:da42fdcbf278558d5d1e93",
 };
