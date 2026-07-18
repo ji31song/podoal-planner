@@ -3,10 +3,10 @@
     "invites": {
       "$code": {
         ".read": "auth != null",
-        ".write": "auth != null && ((!data.exists() && newData.child('familyId').isString() && root.child('families').child(newData.child('familyId').val()).child('meta').child('owner').val() === auth.uid) || (data.child('familyId').isString() && root.child('families').child(data.child('familyId').val()).child('meta').child('owner').val() === auth.uid) || (data.isString() && root.child('families').child(data.val()).child('meta').child('owner').val() === auth.uid))",
+        ".write": "auth != null && $code.matches(/^[A-HJKMNP-Z2-9]{6}$/) && ((!data.exists() && newData.child('familyId').isString() && root.child('families').child(newData.child('familyId').val()).child('meta').child('owner').val() === auth.uid) || (data.child('familyId').isString() && root.child('families').child(data.child('familyId').val()).child('meta').child('owner').val() === auth.uid) || (data.isString() && root.child('families').child(data.val()).child('meta').child('owner').val() === auth.uid))",
         ".validate": "newData.hasChildren(['familyId', 'expiresAt'])",
         "familyId": { ".validate": "newData.isString()" },
-        "expiresAt": { ".validate": "newData.isNumber()" },
+        "expiresAt": { ".validate": "newData.isNumber() && newData.val() > now && newData.val() <= now + 172800000 && newData.val() === root.child('families').child(newData.parent().child('familyId').val()).child('meta').child('inviteExpiresAt').val() && root.child('families').child(newData.parent().child('familyId').val()).child('meta').child('inviteCode').val() === $code && root.child('families').child(newData.parent().child('familyId').val()).child('meta').child('inviteActive').val() === true" },
         "$other": { ".validate": false }
       }
     },
@@ -19,9 +19,9 @@
     "families": {
       "$fid": {
         ".read": "auth != null && data.child('auth').child(auth.uid).exists()",
-        ".write": "auth != null && !data.exists() && newData.child('meta').child('owner').val() === auth.uid && newData.child('meta').child('inviteCode').isString() && newData.child('meta').child('inviteExpiresAt').isNumber() && newData.child('meta').child('inviteActive').val() === true && newData.child('auth').child(auth.uid).val() === newData.child('meta').child('inviteCode').val()",
+        ".write": "auth != null && auth.token.firebase.sign_in_provider === 'google.com' && !data.exists() && newData.child('meta').child('owner').val() === auth.uid && newData.child('meta').child('inviteCode').isString() && newData.child('meta').child('inviteCode').val().matches(/^[A-HJKMNP-Z2-9]{6}$/) && newData.child('meta').child('inviteExpiresAt').isNumber() && newData.child('meta').child('inviteExpiresAt').val() > now && newData.child('meta').child('inviteExpiresAt').val() <= now + 172800000 && newData.child('meta').child('inviteActive').val() === true && newData.child('auth').child(auth.uid).val() === newData.child('meta').child('inviteCode').val()",
         "meta": {
-          ".write": "auth != null && data.child('owner').val() === auth.uid && newData.exists() && newData.child('owner').val() === data.child('owner').val() && newData.child('inviteCode').isString() && newData.child('inviteExpiresAt').isNumber() && newData.child('inviteActive').isBoolean()"
+          ".write": "auth != null && data.child('owner').val() === auth.uid && newData.exists() && newData.child('owner').val() === data.child('owner').val() && newData.child('inviteCode').isString() && newData.child('inviteCode').val().matches(/^[A-HJKMNP-Z2-9]{6}$/) && newData.child('inviteExpiresAt').isNumber() && newData.child('inviteActive').isBoolean() && (newData.child('inviteActive').val() === false || (newData.child('inviteExpiresAt').val() > now && newData.child('inviteExpiresAt').val() <= now + 172800000))"
         },
         "auth": {
           "$uid": {

@@ -18,4 +18,7 @@
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-renamesourcefileattribute SourceFile
+
+# Firebase Authentication 플러그인의 선택적 Facebook 로그인 코드는 사용하지 않는다.
+-dontwarn com.facebook.**

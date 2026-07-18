@@ -61,6 +61,10 @@ function db(uid) {
   return testEnv.authenticatedContext(uid).database();
 }
 
+function dbWithProvider(uid, signInProvider) {
+  return testEnv.authenticatedContext(uid, { firebase: { sign_in_provider: signInProvider } }).database();
+}
+
 async function seed() {
   await testEnv.withSecurityRulesDisabled(async context => {
     const adminDb = context.database();
@@ -102,6 +106,22 @@ describe("가족 간 데이터 분리", () => {
 
   test("일반 구성원은 가족 전체를 삭제할 수 없다", async () => {
     await assertFails(remove(ref(db("adultA"), "families/familyA")));
+  });
+});
+
+describe("가족 생성 계정 제한", () => {
+  const newFamily = ownerUid => ({
+    meta: { owner: ownerUid, inviteCode: "NEW234", inviteExpiresAt: Date.now() + 60_000, inviteActive: true, createdAt: Date.now() },
+    auth: { [ownerUid]: "NEW234" },
+    family: { name: "", members: [] },
+  });
+
+  test("Google 로그인 계정은 가족을 만들 수 있다", async () => {
+    await assertSucceeds(set(ref(dbWithProvider("googleOwner", "google.com"), "families/newFamily"), newFamily("googleOwner")));
+  });
+
+  test("익명 참여 계정은 가족을 직접 만들 수 없다", async () => {
+    await assertFails(set(ref(dbWithProvider("anonymousMember", "anonymous"), "families/newFamily"), newFamily("anonymousMember")));
   });
 });
 
@@ -208,8 +228,32 @@ describe("48시간 초대 코드", () => {
   });
 
   test("소유자는 새 코드를 등록하고 이전 코드를 삭제할 수 있다", async () => {
-    await assertSucceeds(set(ref(db("ownerA"), "invites/NEW234"), { familyId: "familyA", expiresAt: Date.now() + 172800000 }));
+    const expiresAt = Date.now() + 172700000;
+    await assertSucceeds(update(ref(db("ownerA"), "families/familyA/meta"), {
+      inviteCode: "NEW234",
+      inviteExpiresAt: expiresAt,
+      inviteActive: true,
+    }));
+    await assertSucceeds(set(ref(db("ownerA"), "invites/NEW234"), { familyId: "familyA", expiresAt }));
     await assertSucceeds(remove(ref(db("ownerA"), "invites/ABC234")));
+  });
+
+  test("소유자도 48시간을 넘는 초대 코드는 만들 수 없다", async () => {
+    const expiresAt = Date.now() + 172800000 + 60_000;
+    await assertFails(update(ref(db("ownerA"), "families/familyA/meta"), {
+      inviteCode: "NEW234",
+      inviteExpiresAt: expiresAt,
+      inviteActive: true,
+    }));
+  });
+
+  test("혼동하기 쉬운 문자가 든 초대 코드는 만들 수 없다", async () => {
+    const expiresAt = Date.now() + 60_000;
+    await assertFails(update(ref(db("ownerA"), "families/familyA/meta"), {
+      inviteCode: "ABL234",
+      inviteExpiresAt: expiresAt,
+      inviteActive: true,
+    }));
   });
 
   test("일반 구성원은 초대 코드를 발급하거나 폐기할 수 없다", async () => {

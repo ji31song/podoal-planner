@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalizeInviteCode, validateInvite } from "../invite-validation.js";
+import { isInviteCode, normalizeInviteCode, validateInvite } from "../invite-validation.js";
 
 const now = 1_000_000;
 const valid = () => ({
@@ -12,6 +12,15 @@ const valid = () => ({
 
 test("초대 코드 입력을 정규화한다", () => {
   assert.equal(normalizeInviteCode(" ab-c234 "), "ABC234");
+});
+
+test("정해진 6자리 문자만 초대 코드로 허용한다", () => {
+  assert.equal(isInviteCode("ABC234"), true);
+  assert.equal(isInviteCode("ABCI23"), false);
+  assert.equal(isInviteCode("ABCL23"), false);
+  assert.equal(isInviteCode("ABCO23"), false);
+  assert.equal(isInviteCode("ABC230"), false);
+  assert.equal(isInviteCode("ABC23"), false);
 });
 
 test("유효한 초대 코드를 승인한다", () => {

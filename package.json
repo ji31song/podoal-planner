@@ -3,17 +3,26 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test": "powershell -ExecutionPolicy Bypass -File scripts/run-all-tests.ps1",
+    "test:functions": "npm --prefix functions test",
     "test:rules": "firebase emulators:exec --only database \"node --test tests/database.rules.test.mjs\"",
+    "test:security": "node scripts/security-check.mjs",
     "android:prepare": "node scripts/prepare-android-web.mjs && cap sync android",
-    "android:open": "cap open android"
+    "android:open": "cap open android",
+    "android:release": "powershell -ExecutionPolicy Bypass -File scripts/build-play-aab.ps1",
+    "android:create-upload-key": "powershell -ExecutionPolicy Bypass -File scripts/create-upload-key.ps1",
+    "brand:generate": "node scripts/generate-brand-assets.cjs",
+    "hosting:prepare": "node scripts/prepare-policy-site.mjs"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.4.2",
     "@firebase/rules-unit-testing": "^5.0.0",
     "firebase": "^12.0.0",
-    "firebase-tools": "^14.0.0"
+    "firebase-tools": "^15.24.0",
+    "sharp": "^0.34.5"
   },
   "dependencies": {
+    "@capacitor-firebase/app-check": "^8.2.0",
     "@capacitor-firebase/authentication": "^8.3.0",
     "@capacitor/android": "^8.4.2",
     "@capacitor/core": "^8.4.2"

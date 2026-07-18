@@ -1,6 +1,33 @@
 *.png
+!icon-192.png
+!icon-512.png
+!store-assets/icon-source.png
+!store-assets/store-icon.png
+!store-assets/feature-graphic.png
+!android/app/src/main/res/**/ic_launcher*.png
+!android/app/src/main/res/**/splash.png
 node_modules/
 .tools/
 www/
+policy-site/
 firebase-debug.log
 database-debug.log
+*.log
+
+# Local secrets and signing material
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p12
+*.pem
+service-account*.json
+**/service-account*.json
+firebase-token*.txt
+
+# Build and editor outputs
+*.apk
+*.aab
+.idea/
+.vscode/

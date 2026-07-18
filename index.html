@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" type="image/png">
 <title>포도알플래너</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -524,28 +524,53 @@
   </div>
 </div>
 
+<div id="connectionScreen" class="ovl" style="display:none">
+  <div class="setup-card" style="text-align:center">
+    <h2>서버에 연결하지 못했어요</h2>
+    <div class="sub" style="line-height:1.6">
+      가족 데이터를 안전하게 불러오기 위해<br>
+      인터넷 연결을 확인한 뒤 다시 시도해 주세요.<br>
+      연결되지 않은 상태에서는 입력한 내용을 저장하지 않아요.
+    </div>
+    <button class="big-btn" id="retryConnectionBtn">다시 연결하기</button>
+    <div class="err-msg" id="connectionError">문제가 계속되면 잠시 후 다시 시도해 주세요.</div>
+  </div>
+</div>
+
 <div id="authScreen" class="ovl" style="display:none">
   <div class="setup-card" style="text-align:center">
     <h2><svg class="icon" style="width:20px;height:20px;vertical-align:-3px" viewBox="0 0 24 24"><path d="M22 5V2l-5.89 5.89"/><circle cx="16.6" cy="15.89" r="3"/><circle cx="8.11" cy="7.4" r="3"/><circle cx="12.35" cy="11.65" r="3"/><circle cx="13.91" cy="5.85" r="3"/><circle cx="18.15" cy="10.09" r="3"/><circle cx="6.56" cy="13.2" r="3"/><circle cx="10.8" cy="17.44" r="3"/><circle cx="5" cy="19" r="3"/></svg> 포도알플래너</h2>
     <div class="sub">가족이 함께 쓰는 일정관리</div>
-    <button class="big-btn" id="googleLoginBtn">구글로 시작하기</button>
+    <button class="big-btn" id="googleLoginBtn">새 가족 만들기 · Google 로그인</button>
+    <div class="divider">─ 또는 ─</div>
+    <label style="text-align:left">초대코드로 참여</label>
+    <div class="add-row" style="margin-top:0">
+      <input type="text" id="joinCodeInput" placeholder="예: AB2CD3" maxlength="8" style="text-transform:uppercase" autocomplete="off" aria-label="가족 초대코드">
+      <button id="joinFamilyBtn">참여</button>
+    </div>
+    <div class="sub" style="line-height:1.6;margin:10px 0 0">초대받은 구성원은 Google 로그인 없이 참여할 수 있어요.<br>이 기기에 안전한 참여 계정이 자동으로 만들어져요.</div>
     <div class="err-msg" id="authError"></div>
   </div>
 </div>
 
 <div id="startScreen" class="ovl" style="display:none">
   <div class="setup-card">
-    <h2 style="text-align:center">시작하기</h2>
-    <div class="sub">처음이면 가족을 만들고, 가족이 이미 만들었다면 초대 코드로 참여하세요</div>
-    <button class="big-btn" id="createFamilyBtn">새 가족 만들기</button>
-    <div class="divider">─ 또는 ─</div>
-    <label style="font-size:13px;font-weight:700;display:block;margin:10px 0 6px">초대 코드로 참여</label>
-    <div class="add-row" style="margin-top:0">
-      <input type="text" id="joinCodeInput" placeholder="예: AB2CD3" maxlength="8" style="text-transform:uppercase" autocomplete="off">
-      <button id="joinFamilyBtn">참여</button>
+    <div id="ownerStartActions">
+      <h2 style="text-align:center">새 가족 만들기</h2>
+      <div class="sub">가족 대표 Google 계정으로 로그인됐어요.<br>가족을 만든 뒤 초대코드를 구성원에게 알려주세요.</div>
+      <button class="big-btn" id="createFamilyBtn">가족 만들기</button>
+      <button class="link-btn" id="logoutBtn1">다른 Google 계정으로 로그인</button>
+    </div>
+    <div id="anonymousStartActions" style="display:none">
+      <h2 style="text-align:center">초대코드로 참여</h2>
+      <div class="sub">가족 대표에게 받은 6자리 코드를 입력하세요.<br>참여 후 가족 대표의 연결 승인이 필요해요.</div>
+      <div class="add-row" style="margin-top:0">
+        <input type="text" id="retryJoinCodeInput" placeholder="예: AB2CD3" maxlength="8" style="text-transform:uppercase" autocomplete="off" aria-label="가족 초대코드 다시 입력">
+        <button id="retryJoinFamilyBtn">참여</button>
+      </div>
+      <button class="link-btn" id="resetAnonymousBtn">처음 화면으로 돌아가기</button>
     </div>
     <div class="err-msg" id="startError"></div>
-    <button class="link-btn" id="logoutBtn1">다른 계정으로 로그인</button>
   </div>
 </div>
 
@@ -623,6 +648,11 @@
         <button id="transferOwnershipBtn">이전</button>
       </div>
     </div>
+    <div id="linkedAccountsPanel" class="setup-card" style="display:none">
+      <div class="settings-group-title">기기 연결 관리</div>
+      <div class="settings-group-desc">분실했거나 앱을 삭제한 구성원의 예전 연결을 끊으면 새 기기에서 다시 참여할 수 있어요.</div>
+      <div id="linkedAccountsList"></div>
+    </div>
     <div class="setup-card" id="familyActions" style="display:none">
       <div class="settings-group-title">가족 관리</div>
       <div class="settings-group-desc">가족 탈퇴 또는 가족 전체 데이터를 삭제하는 작업이에요.</div>
@@ -631,7 +661,7 @@
     </div>
     <div class="setup-card" id="accountActions" style="display:none">
       <div class="settings-group-title">계정</div>
-      <div class="settings-group-desc">로그아웃해도 저장된 가족 데이터는 그대로 유지돼요.</div>
+      <div class="settings-group-desc" id="accountActionHint">로그아웃해도 저장된 가족 데이터는 그대로 유지돼요.</div>
       <button class="settings-action" id="logoutBtn2" style="display:none">로그아웃</button>
       <div class="account-danger">
         <button class="settings-action danger" id="deleteAccountBtn" style="display:none">계정 삭제</button>
@@ -804,8 +834,7 @@ function canEditPhonebook() {
   return !fbMode || canManageFamily() || !!(mine && mine.role === "adult");
 }
 
-/* ===== 저장소 (Firebase 또는 localStorage) ===== */
-const LS_KEY = "podoal-planner";
+/* ===== Firebase 저장소 ===== */
 let store = null;
 let db = null, dbMod = null, authMod = null, functionsMod = null, fbAuth = null, fbFunctions = null;
 let uid = null, familyId = null;
@@ -818,8 +847,16 @@ let inviteMigrationAttempted = false;
 let familyUnsubscribe = null;
 let setupEditing = false; // 설정 화면 가족 정보 편집 모드
 let settingsReopenChecked = false; // 약관 페이지에서 돌아왔을 때 설정 화면 복원용
+let pendingAnonymousJoin = false;
+
+function logSafeError(context, error) {
+  const rawCode = error && (error.code || error.name);
+  const code = String(rawCode || "unknown").replace(/[^0-9A-Za-z_./-]/g, "").slice(0, 80);
+  console.error(`${context}: ${code}`);
+}
 
 function showScreen(name) {
+  document.getElementById("connectionScreen").style.display = name === "connection" ? "flex" : "none";
   document.getElementById("authScreen").style.display = name === "auth" ? "flex" : "none";
   document.getElementById("startScreen").style.display = name === "start" ? "flex" : "none";
   document.getElementById("whoScreen").style.display = name === "who" ? "flex" : "none";
@@ -833,53 +870,79 @@ function setSync(text, on) {
   st.classList.toggle("on", !!on);
 }
 
-async function initStore() {
-  if (window.FIREBASE_CONFIG) {
-    try {
-      const appMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-      dbMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
-      authMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
-      functionsMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js");
-      const app = appMod.initializeApp(window.FIREBASE_CONFIG);
-      db = dbMod.getDatabase(app);
-      fbAuth = authMod.getAuth(app);
-      fbFunctions = functionsMod.getFunctions(app, "asia-northeast3");
-      fbMode = true;
-      setSync("로그인 확인 중", false);
-      authMod.onAuthStateChanged(fbAuth, async (user) => {
-        if (!user) { setSync("로그인이 필요해요", false); showScreen("auth"); return; }
-        uid = user.uid;
-        try {
-          const snap = await dbMod.get(dbMod.ref(db, `users/${uid}/familyId`));
-          familyId = snap.val();
-        } catch (e) { familyId = null; }
-        if (!familyId) { setSync("가족을 만들거나 참여해 주세요", false); showScreen("start"); return; }
-        attachFamily();
-      });
-      return;
-    } catch (e) {
-      console.error("Firebase 연결 실패, 로컬 저장으로 전환:", e);
-      fbMode = false;
-    }
+async function initializeNativeAppCheck(app) {
+  if (!window.Capacitor?.isNativePlatform?.()) {
+    console.warn("App Check is only enabled in the Android app.");
+    return;
   }
-  // localStorage 모드
-  const saved = localStorage.getItem(LS_KEY);
-  data = normalize(saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(EMPTY_DATA)));
-  store = {
-    write(path, value) {
-      const keys = path.split("/");
-      let obj = data;
-      for (let i = 0; i < keys.length - 1; i++) {
-        if (obj[keys[i]] == null) obj[keys[i]] = {};
-        obj = obj[keys[i]];
-      }
-      if (value === null) delete obj[keys[keys.length-1]];
-      else obj[keys[keys.length-1]] = value;
-      localStorage.setItem(LS_KEY, JSON.stringify(data));
-      render();
+
+  const nativeAppCheck = window.Capacitor?.Plugins?.FirebaseAppCheck;
+  if (!nativeAppCheck) throw new Error("NATIVE_APP_CHECK_UNAVAILABLE");
+
+  const appCheckMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js");
+  const provider = new appCheckMod.CustomProvider({
+    getToken: async () => {
+      const result = await nativeAppCheck.getToken({ forceRefresh: false });
+      if (!result?.token) throw new Error("APP_CHECK_TOKEN_MISSING");
+      return {
+        token: result.token,
+        expireTimeMillis: Number(result.expireTimeMillis) || Date.now() + 55 * 60 * 1000,
+      };
     },
-  };
-  render();
+  });
+
+  appCheckMod.initializeAppCheck(app, {
+    provider,
+    isTokenAutoRefreshEnabled: true,
+  });
+}
+
+async function initStore() {
+  if (!window.FIREBASE_CONFIG) {
+    console.error("Firebase 설정을 찾을 수 없습니다.");
+    showScreen("connection");
+    return;
+  }
+  try {
+    const appMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    dbMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+    authMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+    functionsMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js");
+    const app = appMod.initializeApp(window.FIREBASE_CONFIG);
+    await initializeNativeAppCheck(app);
+    db = dbMod.getDatabase(app);
+    fbAuth = authMod.getAuth(app);
+    fbFunctions = functionsMod.getFunctions(app, "asia-northeast3");
+    fbMode = true;
+    setSync("로그인 확인 중", false);
+    authMod.onAuthStateChanged(fbAuth, async (user) => {
+      if (!user) { setSync("로그인이 필요해요", false); showScreen("auth"); return; }
+      uid = user.uid;
+      try {
+        const snap = await dbMod.get(dbMod.ref(db, `users/${uid}/familyId`));
+        familyId = snap.val();
+      } catch (e) { familyId = null; }
+      if (!familyId) {
+        setSync(user.isAnonymous ? "초대코드를 입력해 주세요" : "가족을 만들어 주세요", false);
+        if (pendingAnonymousJoin) return;
+        configureStartScreen(user);
+        showScreen("start");
+        return;
+      }
+      attachFamily();
+    });
+  } catch (e) {
+    logSafeError("Firebase 연결 실패", e);
+    fbMode = false;
+    showScreen("connection");
+  }
+}
+
+function configureStartScreen(user = fbAuth && fbAuth.currentUser) {
+  const anonymous = !!(user && user.isAnonymous);
+  document.getElementById("ownerStartActions").style.display = anonymous ? "none" : "block";
+  document.getElementById("anonymousStartActions").style.display = anonymous ? "block" : "none";
+  document.getElementById("startError").textContent = "";
 }
 
 function attachFamily() {
@@ -895,7 +958,7 @@ function attachFamily() {
     setSync("실시간 공유 중", true);
     render();
   }, (err) => {
-    console.error("가족 데이터 접근 실패:", err);
+    logSafeError("가족 데이터 접근 실패", err);
     familyId = null;
     setSync("가족을 만들거나 참여해 주세요", false);
     showScreen("start");
@@ -910,7 +973,15 @@ async function genInviteCode() {
   const A = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
   for (let t = 0; t < 8; t++) {
     let c = "";
-    for (let i = 0; i < 6; i++) c += A[Math.floor(Math.random() * A.length)];
+    while (c.length < 6) {
+      const bytes = crypto.getRandomValues(new Uint8Array(16));
+      const unbiasedLimit = 256 - (256 % A.length);
+      for (const value of bytes) {
+        if (value >= unbiasedLimit) continue;
+        c += A[value % A.length];
+        if (c.length === 6) break;
+      }
+    }
     const snap = await dbMod.get(dbMod.ref(db, `invites/${c}`));
     if (!snap.exists()) return c;
   }
@@ -923,11 +994,11 @@ async function ensureInviteMetadata() {
   inviteMigrationAttempted = true;
   const expiresAt = Date.now() + INVITE_VALID_MS;
   const code = data.meta.inviteCode;
-  await dbMod.update(dbMod.ref(db), {
-    [`families/${familyId}/meta/inviteExpiresAt`]: expiresAt,
-    [`families/${familyId}/meta/inviteActive`]: true,
-    [`invites/${code}`]: { familyId, expiresAt },
+  await dbMod.update(dbMod.ref(db, `families/${familyId}/meta`), {
+    inviteExpiresAt: expiresAt,
+    inviteActive: true,
   });
+  await dbMod.set(dbMod.ref(db, `invites/${code}`), { familyId, expiresAt });
 }
 
 async function reissueInvite() {
@@ -935,14 +1006,13 @@ async function reissueInvite() {
   const oldCode = data.meta && data.meta.inviteCode;
   const code = await genInviteCode();
   const expiresAt = Date.now() + INVITE_VALID_MS;
-  const updates = {
-    [`families/${familyId}/meta/inviteCode`]: code,
-    [`families/${familyId}/meta/inviteExpiresAt`]: expiresAt,
-    [`families/${familyId}/meta/inviteActive`]: true,
-    [`invites/${code}`]: { familyId, expiresAt },
-  };
-  if (oldCode && oldCode !== code) updates[`invites/${oldCode}`] = null;
-  await dbMod.update(dbMod.ref(db), updates);
+  await dbMod.update(dbMod.ref(db, `families/${familyId}/meta`), {
+    inviteCode: code,
+    inviteExpiresAt: expiresAt,
+    inviteActive: true,
+  });
+  await dbMod.set(dbMod.ref(db, `invites/${code}`), { familyId, expiresAt });
+  if (oldCode && oldCode !== code) await dbMod.remove(dbMod.ref(db, `invites/${oldCode}`));
 }
 
 async function revokeInvite() {
@@ -957,6 +1027,7 @@ async function createFamily() {
   const errBox = document.getElementById("startError");
   errBox.textContent = "";
   try {
+    if (!fbAuth.currentUser || fbAuth.currentUser.isAnonymous) throw new Error("GOOGLE_OWNER_REQUIRED");
     const code = await genInviteCode();
     const fid = dbMod.push(dbMod.ref(db, "families")).key;
     const expiresAt = Date.now() + INVITE_VALID_MS;
@@ -970,17 +1041,24 @@ async function createFamily() {
     familyId = fid;
     attachFamily();
   } catch (e) {
-    console.error(e);
+    logSafeError("가족 생성 실패", e);
     errBox.textContent = "가족을 만들지 못했어요. 잠시 후 다시 시도해 주세요";
   }
 }
 
-async function joinFamily() {
-  const errBox = document.getElementById("startError");
+async function joinFamily(inputId = "joinCodeInput", errorId = "authError") {
+  const errBox = document.getElementById(errorId);
   errBox.textContent = "";
-  const code = document.getElementById("joinCodeInput").value.replace(/[^0-9A-Za-z]/g, "").toUpperCase();
+  const input = document.getElementById(inputId);
+  const button = inputId === "joinCodeInput" ? document.getElementById("joinFamilyBtn") : document.getElementById("retryJoinFamilyBtn");
+  const code = input.value.replace(/[^0-9A-Za-z]/g, "").toUpperCase();
   if (code.length < 6) { errBox.textContent = "6자리 초대 코드를 입력해 주세요"; return; }
+  button.disabled = true;
+  pendingAnonymousJoin = true;
   try {
+    let user = fbAuth.currentUser;
+    if (!user) user = (await authMod.signInAnonymously(fbAuth)).user;
+    if (!user || !user.isAnonymous) throw new Error("ANONYMOUS_JOIN_REQUIRED");
     const callJoinFamily = functionsMod.httpsCallable(fbFunctions, "joinFamily");
     const result = await callJoinFamily({ code });
     const fid = result.data && result.data.familyId;
@@ -988,13 +1066,16 @@ async function joinFamily() {
     familyId = fid;
     attachFamily();
   } catch (e) {
-    console.error(e);
+    logSafeError("가족 가입 실패", e);
     const message = e && e.message ? e.message : "";
     errBox.textContent = /만료/.test(message)
       ? "만료된 초대 코드예요. 가족 소유자에게 새 코드를 요청해 주세요"
       : /이미 가족/.test(message)
         ? "이미 다른 가족에 가입된 계정이에요"
         : "참여하지 못했어요. 코드를 다시 확인해 주세요";
+  } finally {
+    pendingAnonymousJoin = false;
+    button.disabled = false;
   }
 }
 
@@ -1015,17 +1096,50 @@ async function googleLogin() {
       await authMod.signInWithPopup(fbAuth, new authMod.GoogleAuthProvider());
     }
   } catch (e) {
-    console.error(e);
+    logSafeError("Google 로그인 실패", e);
     errBox.textContent = "로그인에 실패했어요. 다시 시도해 주세요";
   }
 }
 
 async function logout() {
-  if (fbAuth) await authMod.signOut(fbAuth);
-  if (window.Capacitor?.isNativePlatform?.()) {
-    await window.Capacitor?.Plugins?.FirebaseAuthentication?.signOut();
+  const user = fbAuth && fbAuth.currentUser;
+  try {
+    if (user && user.isAnonymous) {
+      const callLeaveFamily = functionsMod.httpsCallable(fbFunctions, "leaveFamily");
+      await callLeaveFamily({ deleteAnonymousAccount: true });
+    }
+    if (fbAuth) await authMod.signOut(fbAuth);
+    if (window.Capacitor?.isNativePlatform?.() && (!user || !user.isAnonymous)) {
+      await window.Capacitor?.Plugins?.FirebaseAuthentication?.signOut();
+    }
+    location.reload();
+  } catch (e) {
+    logSafeError(user && user.isAnonymous ? "기기 연결 해제 실패" : "로그아웃 실패", e);
+    const message = e && e.message ? e.message : "";
+    const errorBox = document.getElementById("setupScreen").style.display !== "none"
+      ? document.getElementById("setupError")
+      : document.getElementById("startError");
+    errorBox.textContent = /소유자/.test(message)
+      ? "가족 소유자는 소유권을 다른 어른에게 이전한 뒤 연결을 해제할 수 있어요"
+      : "연결을 해제하지 못했어요. 잠시 후 다시 시도해 주세요";
   }
-  location.reload();
+}
+
+async function resetAnonymousAccount() {
+  const user = fbAuth && fbAuth.currentUser;
+  if (!user || !user.isAnonymous) { showScreen("auth"); return; }
+  const button = document.getElementById("resetAnonymousBtn");
+  button.disabled = true;
+  try {
+    const callDeleteAccount = functionsMod.httpsCallable(fbFunctions, "deleteAccount");
+    await callDeleteAccount({ confirmation: "DELETE_ACCOUNT" });
+    await authMod.signOut(fbAuth).catch(() => {});
+    location.reload();
+  } catch (e) {
+    logSafeError("익명 참여 계정 초기화 실패", e);
+    document.getElementById("startError").textContent = "처음 화면으로 돌아가지 못했어요. 잠시 후 다시 시도해 주세요";
+    button.disabled = false;
+  }
 }
 
 function clearFamilySession() {
@@ -1042,20 +1156,61 @@ function clearFamilySession() {
   showScreen("start");
 }
 
-async function leaveFamily(deleteFamily = false) {
+async function reauthenticateCurrentUser() {
+  const user = fbAuth.currentUser;
+  if (!user) throw new Error("AUTH_REQUIRED");
+  if (user.isAnonymous) return user;
+  if (window.Capacitor?.isNativePlatform?.()) {
+    const nativeAuth = window.Capacitor?.Plugins?.FirebaseAuthentication;
+    if (!nativeAuth) throw new Error("NATIVE_AUTH_UNAVAILABLE");
+    const result = await nativeAuth.signInWithGoogle();
+    const idToken = result?.credential?.idToken;
+    const accessToken = result?.credential?.accessToken;
+    if (!idToken) throw new Error("GOOGLE_ID_TOKEN_MISSING");
+    const credential = authMod.GoogleAuthProvider.credential(idToken, accessToken || null);
+    await authMod.reauthenticateWithCredential(user, credential);
+  } else {
+    await authMod.reauthenticateWithPopup(user, new authMod.GoogleAuthProvider());
+  }
+  await user.getIdToken(true);
+  return user;
+}
+
+async function leaveFamily() {
   const leaveBtn = document.getElementById("leaveFamilyBtn");
   leaveBtn.disabled = true;
   try {
     const callLeaveFamily = functionsMod.httpsCallable(fbFunctions, "leaveFamily");
-    await callLeaveFamily({ deleteFamily });
+    await callLeaveFamily({ deleteFamily: false });
     clearFamilySession();
   } catch (e) {
-    console.error("가족 탈퇴 실패:", e);
+    logSafeError("가족 탈퇴 실패", e);
     document.getElementById("setupError").textContent = /소유자/.test(e && e.message ? e.message : "")
       ? "가족 소유자는 소유권을 이전한 뒤 탈퇴할 수 있어요"
       : "가족에서 탈퇴하지 못했어요. 잠시 후 다시 시도해 주세요";
   } finally {
     leaveBtn.disabled = false;
+  }
+}
+
+async function deleteFamily() {
+  const button = document.getElementById("deleteFamilyBtn");
+  button.disabled = true;
+  try {
+    await reauthenticateCurrentUser();
+    const callLeaveFamily = functionsMod.httpsCallable(fbFunctions, "leaveFamily");
+    await callLeaveFamily({ deleteFamily: true, confirmation: "DELETE_FAMILY" });
+    clearFamilySession();
+  } catch (e) {
+    logSafeError("가족 삭제 실패", e);
+    const message = e && e.message ? e.message : "";
+    document.getElementById("setupError").textContent = /구성원/.test(message)
+      ? "다른 구성원이 남아 있어 가족을 삭제할 수 없어요"
+      : fbAuth.currentUser && fbAuth.currentUser.isAnonymous
+        ? "가족을 삭제하지 못했어요. 잠시 후 다시 시도해 주세요"
+        : "가족을 삭제하지 못했어요. Google 로그인 확인 후 다시 시도해 주세요";
+  } finally {
+    button.disabled = false;
   }
 }
 
@@ -1067,39 +1222,70 @@ async function transferOwnership() {
     await callTransfer({ successorUid });
     document.getElementById("setupError").textContent = "가족 소유권을 이전했어요. 이제 가족에서 탈퇴할 수 있어요";
   } catch (e) {
-    console.error("소유권 이전 실패:", e);
+    logSafeError("소유권 이전 실패", e);
     document.getElementById("setupError").textContent = "소유권을 이전하지 못했어요. 연결된 어른인지 확인해 주세요";
   }
+}
+
+async function disconnectLinkedAccount(targetUid) {
+  try {
+    const callDisconnect = functionsMod.httpsCallable(fbFunctions, "disconnectMemberAccount");
+    await callDisconnect({ targetUid });
+    document.getElementById("setupError").textContent = "예전 기기 연결을 끊었어요. 이제 새 기기에서 초대코드로 다시 참여할 수 있어요";
+  } catch (e) {
+    logSafeError("구성원 기기 연결 해제 실패", e);
+    document.getElementById("setupError").textContent = "기기 연결을 끊지 못했어요. 잠시 후 다시 시도해 주세요";
+  }
+}
+
+function renderLinkedAccounts(linkedAccounts) {
+  const panel = document.getElementById("linkedAccountsPanel");
+  const box = document.getElementById("linkedAccountsList");
+  const canManage = canManageFamily();
+  panel.style.display = canManage && linkedAccounts.length ? "block" : "none";
+  box.innerHTML = "";
+  if (!canManage) return;
+  linkedAccounts.forEach(([accountUid, memberId]) => {
+    const member = members().find(entry => entry.id === memberId);
+    const row = document.createElement("div");
+    row.className = "su-row";
+    const main = document.createElement("div");
+    main.className = "su-main";
+    const name = document.createElement("span");
+    name.style.flex = "1";
+    name.textContent = member ? member.name : "프로필을 고르지 않은 기기";
+    const button = document.createElement("button");
+    button.className = "danger";
+    button.textContent = "연결 끊기";
+    button.addEventListener("click", () => {
+      askConfirm(
+        `${member ? member.name : "이 구성원"}의 예전 기기 접근을 끊을까요? 가족 일정과 프로필은 삭제되지 않아요.`,
+        "연결 끊기",
+        () => disconnectLinkedAccount(accountUid),
+      );
+    });
+    main.append(name, button);
+    row.appendChild(main);
+    box.appendChild(row);
+  });
 }
 
 async function deleteAccount() {
   const button = document.getElementById("deleteAccountBtn");
   button.disabled = true;
   try {
-    const user = fbAuth.currentUser;
-    if (!user) throw new Error("AUTH_REQUIRED");
-    if (window.Capacitor?.isNativePlatform?.()) {
-      const nativeAuth = window.Capacitor?.Plugins?.FirebaseAuthentication;
-      if (!nativeAuth) throw new Error("NATIVE_AUTH_UNAVAILABLE");
-      const result = await nativeAuth.signInWithGoogle();
-      const idToken = result?.credential?.idToken;
-      const accessToken = result?.credential?.accessToken;
-      if (!idToken) throw new Error("GOOGLE_ID_TOKEN_MISSING");
-      const credential = authMod.GoogleAuthProvider.credential(idToken, accessToken || null);
-      await authMod.reauthenticateWithCredential(user, credential);
-    } else {
-      await authMod.reauthenticateWithPopup(user, new authMod.GoogleAuthProvider());
-    }
-    await user.getIdToken(true);
+    if (!fbAuth.currentUser || !fbAuth.currentUser.isAnonymous) await reauthenticateCurrentUser();
     const callDeleteAccount = functionsMod.httpsCallable(fbFunctions, "deleteAccount");
-    await callDeleteAccount();
+    await callDeleteAccount({ confirmation: "DELETE_ACCOUNT" });
     location.reload();
   } catch (e) {
-    console.error("계정 삭제 실패:", e);
+    logSafeError("계정 삭제 실패", e);
     const message = e && e.message ? e.message : "";
     document.getElementById("setupError").textContent = /소유권/.test(message)
       ? "다른 어른에게 가족 소유권을 이전한 뒤 계정을 삭제해 주세요"
-      : "계정을 삭제하지 못했어요. Google 로그인 확인 후 다시 시도해 주세요";
+      : fbAuth.currentUser && fbAuth.currentUser.isAnonymous
+        ? "계정을 삭제하지 못했어요. 잠시 후 다시 시도해 주세요"
+        : "계정을 삭제하지 못했어요. Google 로그인 확인 후 다시 시도해 주세요";
   } finally {
     button.disabled = false;
   }
@@ -1143,7 +1329,7 @@ function render() {
     if (!identityClaimBackfillAttempted && (!data.memberClaims || !data.memberClaims[myMemberId])) {
       identityClaimBackfillAttempted = true;
       dbMod.set(dbMod.ref(db, `families/${familyId}/memberClaims/${myMemberId}`), uid)
-        .catch(err => console.warn("기존 계정 연결 보호 정보 생성 실패:", err));
+        .catch(err => logSafeError("기존 계정 연결 보호 정보 생성 실패", err));
     }
     document.getElementById("whoScreen").style.display = "none";
     if (!identityApplied) { currentMemberId = myMemberId; identityApplied = true; }
@@ -1152,7 +1338,7 @@ function render() {
     roleSyncAttempted = true;
     const roles = Object.fromEntries(members().map(m => [m.id, m.role]));
     if (JSON.stringify(data.memberRoles || {}) !== JSON.stringify(roles)) {
-      store.write("memberRoles", roles).catch(err => console.warn("구성원 역할 정보 저장 실패:", err));
+      store.write("memberRoles", roles).catch(err => logSafeError("구성원 역할 정보 저장 실패", err));
     }
   }
   if (!curMember()) currentMemberId = members()[0].id;
@@ -1691,7 +1877,7 @@ async function claimIdentity(memberId) {
       openWhoScreen("가족 소유자에게 연결 승인을 요청했어요");
     }
   } catch (e) {
-    console.error("계정과 구성원 연결 실패:", e);
+    logSafeError("계정과 구성원 연결 실패", e);
     const message = e && e.message === "MEMBER_ALREADY_CLAIMED"
       ? "이미 다른 계정에 연결된 구성원이에요"
       : "계정을 연결하지 못했어요. 잠시 후 다시 시도해 주세요";
@@ -1705,7 +1891,7 @@ async function approveClaim(requestUid, memberId) {
     await store.write(`memberOf/${requestUid}`, memberId);
     await store.write(`pendingClaims/${requestUid}`, null);
   } catch (e) {
-    console.error("구성원 연결 승인 실패:", e);
+    logSafeError("구성원 연결 승인 실패", e);
     document.getElementById("setupError").textContent = "연결을 승인하지 못했어요. 이미 다른 계정에 연결됐는지 확인해 주세요";
   }
 }
@@ -1830,7 +2016,7 @@ function openSetup() {
   const hasInvitePanel = fbMode && canManage && data && data.meta && data.meta.inviteCode;
   document.getElementById("inviteInfo").style.display = hasInvitePanel ? "block" : "none";
   if (hasInvitePanel) {
-    ensureInviteMetadata().catch(err => console.error("기존 초대 코드 전환 실패:", err));
+    ensureInviteMetadata().catch(err => logSafeError("기존 초대 코드 전환 실패", err));
     const active = data.meta.inviteActive !== false && data.meta.inviteExpiresAt > Date.now();
     document.getElementById("inviteCodeText").textContent = active ? data.meta.inviteCode : "초대 중지됨";
     document.getElementById("copyInviteBtn").style.display = active ? "" : "none";
@@ -1839,10 +2025,21 @@ function openSetup() {
       ? `${new Date(data.meta.inviteExpiresAt).toLocaleString("ko-KR")}까지 유효 · 발급 후 48시간`
       : "만료되었거나 폐기된 코드예요. 새 코드를 발급해 주세요";
   }
-  document.getElementById("logoutBtn2").style.display = fbMode ? "block" : "none";
-  document.getElementById("leaveFamilyBtn").style.display = fbMode && !canManage ? "block" : "none";
+  const anonymousUser = !!(fbAuth && fbAuth.currentUser && fbAuth.currentUser.isAnonymous);
+  const logoutButton = document.getElementById("logoutBtn2");
+  logoutButton.style.display = fbMode ? "block" : "none";
+  logoutButton.textContent = anonymousUser ? "이 기기 연결 해제" : "로그아웃";
+  document.getElementById("accountActionHint").textContent = anonymousUser
+    ? "연결을 해제하면 이 기기에서 다시 초대코드와 가족 대표의 승인이 필요해요. 가족 일정과 구성원 정보는 삭제되지 않아요."
+    : "로그아웃해도 저장된 가족 데이터는 그대로 유지돼요.";
+  document.getElementById("leaveFamilyBtn").style.display = fbMode && !canManage && !anonymousUser ? "block" : "none";
   document.getElementById("deleteAccountBtn").style.display = fbMode ? "block" : "none";
   const linkedAccounts = Object.entries((data && data.memberOf) || {}).filter(([accountUid]) => accountUid !== uid);
+  const pendingAccounts = Object.keys((data && data.auth) || {})
+    .filter(accountUid => accountUid !== uid && !(data.memberOf && data.memberOf[accountUid]))
+    .map(accountUid => [accountUid, null]);
+  const manageableAccounts = [...linkedAccounts, ...pendingAccounts];
+  renderLinkedAccounts(manageableAccounts);
   const successorSelect = document.getElementById("ownershipSuccessor");
   const eligibleAdults = linkedAccounts.map(([accountUid, memberId]) => ({ accountUid, member: members().find(m => m.id === memberId) }))
     .filter(entry => entry.member && entry.member.role === "adult");
@@ -1923,23 +2120,41 @@ document.getElementById("editItemsBtn").addEventListener("click", () => { if (ca
 document.getElementById("editSchedBtn").addEventListener("click", () => { if (canEditMember(curMember())) { editingSched = !editingSched; render(); } });
 document.getElementById("editPhoneBtn").addEventListener("click", () => { if (canEditPhonebook()) { editingPhone = !editingPhone; render(); } });
 document.getElementById("settingsBtn").addEventListener("click", () => openSetup());
+document.getElementById("retryConnectionBtn").addEventListener("click", () => location.reload());
 document.getElementById("googleLoginBtn").addEventListener("click", googleLogin);
 document.getElementById("createFamilyBtn").addEventListener("click", createFamily);
-document.getElementById("joinFamilyBtn").addEventListener("click", joinFamily);
-document.getElementById("joinCodeInput").addEventListener("keydown", e => { if (e.key === "Enter") joinFamily(); });
+document.getElementById("joinFamilyBtn").addEventListener("click", () => joinFamily("joinCodeInput", "authError"));
+document.getElementById("joinCodeInput").addEventListener("keydown", e => { if (e.key === "Enter") joinFamily("joinCodeInput", "authError"); });
+document.getElementById("retryJoinFamilyBtn").addEventListener("click", () => joinFamily("retryJoinCodeInput", "startError"));
+document.getElementById("retryJoinCodeInput").addEventListener("keydown", e => { if (e.key === "Enter") joinFamily("retryJoinCodeInput", "startError"); });
+document.getElementById("resetAnonymousBtn").addEventListener("click", resetAnonymousAccount);
 document.getElementById("logoutBtn1").addEventListener("click", logout);
-document.getElementById("logoutBtn2").addEventListener("click", logout);
+document.getElementById("logoutBtn2").addEventListener("click", () => {
+  const anonymousUser = !!(fbAuth && fbAuth.currentUser && fbAuth.currentUser.isAnonymous);
+  if (anonymousUser) {
+    askConfirm("이 기기의 가족 연결을 해제하면 다시 참여할 때 새 초대코드와 가족 대표의 승인이 필요해요. 가족 일정과 구성원 정보는 삭제되지 않아요.", "연결 해제", logout);
+  } else {
+    logout();
+  }
+});
 document.getElementById("leaveFamilyBtn").addEventListener("click", () => {
   askConfirm("가족에서 탈퇴하면 이 가족의 일정과 정보를 더 이상 볼 수 없어요.", "탈퇴할게요", leaveFamily);
 });
 document.getElementById("deleteFamilyBtn").addEventListener("click", () => {
-  askConfirm("가족 구성원과 모든 일정·메모·전화번호가 영구적으로 삭제돼요. 이 작업은 되돌릴 수 없어요.", "가족 삭제", () => leaveFamily(true));
+  askConfirm("가족 구성원과 모든 일정·메모·전화번호가 영구적으로 삭제돼요. 삭제 전에 Google 로그인을 다시 확인합니다.", "가족 삭제", deleteFamily);
 });
 document.getElementById("transferOwnershipBtn").addEventListener("click", () => {
   askConfirm("선택한 어른에게 가족 관리 권한을 넘길까요?", "소유권 이전", transferOwnership);
 });
 document.getElementById("deleteAccountBtn").addEventListener("click", () => {
-  askConfirm("계정과 가족 연결 정보가 영구적으로 삭제돼요. 계속하려면 Google 로그인을 다시 확인해야 해요.", "계정 삭제", deleteAccount);
+  const anonymousUser = !!(fbAuth && fbAuth.currentUser && fbAuth.currentUser.isAnonymous);
+  askConfirm(
+    anonymousUser
+      ? "이 기기의 참여 계정과 연결된 구성원 정보·일정·체크리스트가 영구적으로 삭제돼요. 가족에게 남겨야 할 정보가 없는지 확인해 주세요."
+      : "계정과 가족 연결 정보가 영구적으로 삭제돼요. 계속하려면 Google 로그인을 다시 확인해야 해요.",
+    "계정 삭제",
+    deleteAccount
+  );
 });
 document.getElementById("whoOpenSetup").addEventListener("click", () => openSetup());
 document.getElementById("setupAddMember").addEventListener("click", () => {
@@ -2013,12 +2228,12 @@ document.getElementById("reissueInviteBtn").addEventListener("click", async () =
   const hint = document.getElementById("inviteHint");
   hint.textContent = "새 코드를 발급하는 중이에요";
   try { await reissueInvite(); hint.textContent = "새 초대 코드가 발급됐어요. 이전 코드는 사용할 수 없어요"; }
-  catch (e) { console.error(e); hint.textContent = "새 코드를 발급하지 못했어요. 잠시 후 다시 시도해 주세요"; }
+  catch (e) { logSafeError("초대 코드 재발급 실패", e); hint.textContent = "새 코드를 발급하지 못했어요. 잠시 후 다시 시도해 주세요"; }
 });
 document.getElementById("revokeInviteBtn").addEventListener("click", async () => {
   const hint = document.getElementById("inviteHint");
   try { await revokeInvite(); hint.textContent = "초대를 중지했어요. 이 코드는 더 이상 사용할 수 없어요"; }
-  catch (e) { console.error(e); hint.textContent = "초대를 중지하지 못했어요. 잠시 후 다시 시도해 주세요"; }
+  catch (e) { logSafeError("초대 코드 폐기 실패", e); hint.textContent = "초대를 중지하지 못했어요. 잠시 후 다시 시도해 주세요"; }
 });
 document.getElementById("addItemBtn").addEventListener("click", () => {
   const input = document.getElementById("newItemText");

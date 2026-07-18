@@ -1,5 +1,24 @@
 apply plugin: 'com.android.application'
 
+def versionProperties = new Properties()
+def versionPropertiesFile = rootProject.file('version.properties')
+if (!versionPropertiesFile.exists()) {
+    throw new GradleException('version.properties is required')
+}
+versionPropertiesFile.withInputStream { versionProperties.load(it) }
+
+def signingProperties = new Properties()
+def signingPropertiesFile = rootProject.file('keystore.properties')
+def releaseSigningReady = false
+if (signingPropertiesFile.exists()) {
+    signingPropertiesFile.withInputStream { signingProperties.load(it) }
+    def requiredSigningKeys = ['storeFile', 'storePassword', 'keyAlias', 'keyPassword']
+    releaseSigningReady = requiredSigningKeys.every { signingProperties.getProperty(it)?.trim() }
+    if (!releaseSigningReady) {
+        throw new GradleException('keystore.properties has empty signing values')
+    }
+}
+
 android {
     namespace = "com.jisong.podoalplanner"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +26,8 @@ android {
         applicationId "com.jisong.podoalplanner"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode Integer.parseInt(versionProperties.getProperty('VERSION_CODE'))
+        versionName versionProperties.getProperty('VERSION_NAME')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,11 +35,28 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (releaseSigningReady) {
+            playUpload {
+                storeFile rootProject.file(signingProperties.getProperty('storeFile'))
+                storePassword signingProperties.getProperty('storePassword')
+                keyAlias signingProperties.getProperty('keyAlias')
+                keyPassword signingProperties.getProperty('keyPassword')
+            }
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (releaseSigningReady) {
+                signingConfig signingConfigs.playUpload
+            }
         }
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -35,6 +71,9 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation "com.google.firebase:firebase-appcheck:$firebaseAppCheckVersion"
+    debugImplementation "com.google.firebase:firebase-appcheck-debug:$firebaseAppCheckVersion"
+    releaseImplementation "com.google.firebase:firebase-appcheck-playintegrity:$firebaseAppCheckVersion"
     implementation project(':capacitor-android')
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
