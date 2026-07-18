@@ -31,3 +31,4 @@ firebase-token*.txt
 *.aab
 .idea/
 .vscode/
+!store-assets/screenshots/*.png
