@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>포도알플래너 배경색 비교</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #2F2D2A; font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; padding: 24px; }
+  .grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .phone { width: 340px; border-radius: 24px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,.4); }
+  .label { text-align: center; color: #fff; font-size: 15px; font-weight: 800; padding: 10px 0 14px; }
+  .label small { display: block; font-weight: 400; color: #bbb; margin-top: 3px; font-size: 12px; }
+  .screen { padding: 20px 14px 24px; height: 560px; }
+  header { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px 4px; }
+  .hero { font-size: 44px; }
+  h1 { font-size: 21px; font-weight: 800; letter-spacing: -0.5px; }
+  .today { font-size: 12px; margin-top: 4px; }
+  .tabs { display: flex; gap: 7px; margin-top: 12px; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0 7px; border-radius: 15px; }
+  .tab .av { font-size: 26px; }
+  .tab .lbl { font-size: 12px; font-weight: 800; }
+  .card { background: #fff; border-radius: 18px; padding: 14px; margin-top: 12px; }
+  .card h2 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+  .edit-btn { margin-left: auto; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; border: none; }
+  .prog { border-radius: 999px; height: 8px; margin: 12px 0 6px; overflow: hidden; }
+  .prog i { display: block; height: 100%; width: 66%; background: #8E62AC; border-radius: 999px; }
+  .chk { list-style: none; padding: 0; margin-top: 8px; }
+  .chk li { display: flex; align-items: center; gap: 8px; padding: 8px 2px; font-size: 13px; border-bottom: 1px solid; }
+  .chk input { accent-color: #8E62AC; width: 15px; height: 15px; }
+  .btn { width: 100%; border: none; margin-top: 12px; padding: 12px; color: #fff; font-size: 13px; font-weight: 800; border-radius: 13px; background: linear-gradient(135deg, #9268B0, #7C5296); }
+</style>
+</head>
+<body>
+<div class="grid">
+
+  <!-- A. 현재 크림 -->
+  <div>
+    <div class="label">A. 현재 (크림) <small>#FDF9EE — 지금 상태</small></div>
+    <div class="phone"><div class="screen" style="background:#FDF9EE; color:#6E655A;">
+      <header><span class="hero">🍇</span><div><h1 style="color:#3F372F;">행복패밀리</h1><div class="today" style="color:#ADA599;">오늘은 7월 20일 (월)</div></div></header>
+      <div class="tabs">
+        <div class="tab" style="background:#8E62AC; color:#fff;"><span class="av">🍇</span><span class="lbl">준우</span></div>
+        <div class="tab" style="background:#FBF4E4;"><span class="av">🍇</span><span class="lbl">유진</span></div>
+        <div class="tab" style="background:#FBF4E4;"><span class="av">👩</span><span class="lbl">엄마</span></div>
+        <div class="tab" style="background:#FBF4E4;"><span class="av">👨</span><span class="lbl">아빠</span></div>
+      </div>
+      <div class="card" style="border:1px solid #F4EEE1; box-shadow:0 4px 14px rgba(124,82,150,.06);">
+        <h2 style="color:#3F372F;">🍇 포도알 받기 <button class="edit-btn" style="background:#F7E9D7; color:#B07C4C;">항목 편집</button></h2>
+        <div class="prog" style="background:#EFE7F0;"><i></i></div>
+        <ul class="chk">
+          <li style="border-color:#EFE9DC;"><input type="checkbox" checked> 독해문제집 풀기</li>
+          <li style="border-color:#EFE9DC;"><input type="checkbox"> 방 정리하기</li>
+          <li style="border-color:#EFE9DC;"><input type="checkbox" checked> 학원 제 시간에 가기</li>
+        </ul>
+        <button class="btn">🍇 오늘 포도알 받기</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- B. 웜 그레이 -->
+  <div>
+    <div class="label">B. 웜 그레이 <small>#F5F3F1 — 노란기 제거, 차분한 톤</small></div>
+    <div class="phone"><div class="screen" style="background:#F5F3F1; color:#6B6661;">
+      <header><span class="hero">🍇</span><div><h1 style="color:#3B3835;">행복패밀리</h1><div class="today" style="color:#A5A09A;">오늘은 7월 20일 (월)</div></div></header>
+      <div class="tabs">
+        <div class="tab" style="background:#8E62AC; color:#fff;"><span class="av">🍇</span><span class="lbl">준우</span></div>
+        <div class="tab" style="background:#ECE9E6;"><span class="av">🍇</span><span class="lbl">유진</span></div>
+        <div class="tab" style="background:#ECE9E6;"><span class="av">👩</span><span class="lbl">엄마</span></div>
+        <div class="tab" style="background:#ECE9E6;"><span class="av">👨</span><span class="lbl">아빠</span></div>
+      </div>
+      <div class="card" style="border:1px solid #EDEAE6; box-shadow:0 4px 14px rgba(124,82,150,.06);">
+        <h2 style="color:#3B3835;">🍇 포도알 받기 <button class="edit-btn" style="background:#F2E7DB; color:#A97C52;">항목 편집</button></h2>
+        <div class="prog" style="background:#ECE7EE;"><i></i></div>
+        <ul class="chk">
+          <li style="border-color:#EDEAE5;"><input type="checkbox" checked> 독해문제집 풀기</li>
+          <li style="border-color:#EDEAE5;"><input type="checkbox"> 방 정리하기</li>
+          <li style="border-color:#EDEAE5;"><input type="checkbox" checked> 학원 제 시간에 가기</li>
+        </ul>
+        <button class="btn">🍇 오늘 포도알 받기</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- C. 라벤더 그레이 -->
+  <div>
+    <div class="label">C. 라벤더 그레이 <small>#F6F4F9 — 포도 브랜드색과 연결</small></div>
+    <div class="phone"><div class="screen" style="background:#F6F4F9; color:#6B6672;">
+      <header><span class="hero">🍇</span><div><h1 style="color:#3A3542;">행복패밀리</h1><div class="today" style="color:#A6A0AF;">오늘은 7월 20일 (월)</div></div></header>
+      <div class="tabs">
+        <div class="tab" style="background:#8E62AC; color:#fff;"><span class="av">🍇</span><span class="lbl">준우</span></div>
+        <div class="tab" style="background:#ECE8F2;"><span class="av">🍇</span><span class="lbl">유진</span></div>
+        <div class="tab" style="background:#ECE8F2;"><span class="av">👩</span><span class="lbl">엄마</span></div>
+        <div class="tab" style="background:#ECE8F2;"><span class="av">👨</span><span class="lbl">아빠</span></div>
+      </div>
+      <div class="card" style="border:1px solid #EEEAF3; box-shadow:0 4px 14px rgba(124,82,150,.08);">
+        <h2 style="color:#3A3542;">🍇 포도알 받기 <button class="edit-btn" style="background:#EFE7F6; color:#7C5296;">항목 편집</button></h2>
+        <div class="prog" style="background:#ECE6F1;"><i></i></div>
+        <ul class="chk">
+          <li style="border-color:#EDE9F2;"><input type="checkbox" checked> 독해문제집 풀기</li>
+          <li style="border-color:#EDE9F2;"><input type="checkbox"> 방 정리하기</li>
+          <li style="border-color:#EDE9F2;"><input type="checkbox" checked> 학원 제 시간에 가기</li>
+        </ul>
+        <button class="btn">🍇 오늘 포도알 받기</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- D. 오프 화이트 -->
+  <div>
+    <div class="label">D. 오프 화이트 <small>#FAF9F7 — 밝고 미니멀</small></div>
+    <div class="phone"><div class="screen" style="background:#FAF9F7; color:#6B6661;">
+      <header><span class="hero">🍇</span><div><h1 style="color:#3B3835;">행복패밀리</h1><div class="today" style="color:#A5A09A;">오늘은 7월 20일 (월)</div></div></header>
+      <div class="tabs">
+        <div class="tab" style="background:#8E62AC; color:#fff;"><span class="av">🍇</span><span class="lbl">준우</span></div>
+        <div class="tab" style="background:#F0EEEB;"><span class="av">🍇</span><span class="lbl">유진</span></div>
+        <div class="tab" style="background:#F0EEEB;"><span class="av">👩</span><span class="lbl">엄마</span></div>
+        <div class="tab" style="background:#F0EEEB;"><span class="av">👨</span><span class="lbl">아빠</span></div>
+      </div>
+      <div class="card" style="border:1px solid #EEECE8; box-shadow:0 4px 14px rgba(60,55,50,.07);">
+        <h2 style="color:#3B3835;">🍇 포도알 받기 <button class="edit-btn" style="background:#F2E7DB; color:#A97C52;">항목 편집</button></h2>
+        <div class="prog" style="background:#EEEAEE;"><i></i></div>
+        <ul class="chk">
+          <li style="border-color:#EEECE8;"><input type="checkbox" checked> 독해문제집 풀기</li>
+          <li style="border-color:#EEECE8;"><input type="checkbox"> 방 정리하기</li>
+          <li style="border-color:#EEECE8;"><input type="checkbox" checked> 학원 제 시간에 가기</li>
+        </ul>
+        <button class="btn">🍇 오늘 포도알 받기</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- E. 퓨어 화이트 -->
+  <div>
+    <div class="label">E. 퓨어 화이트 + 보라 라인 <small>#FFFFFF — 섹션을 얇은 보라색 선으로 구분</small></div>
+    <div class="phone"><div class="screen" style="background:#FFFFFF; color:#6B6661;">
+      <header><span class="hero">🍇</span><div><h1 style="color:#3B3835;">행복패밀리</h1><div class="today" style="color:#A5A09A;">오늘은 7월 20일 (월)</div></div></header>
+      <div class="tabs">
+        <div class="tab" style="background:#8E62AC; color:#fff;"><span class="av">🍇</span><span class="lbl">준우</span></div>
+        <div class="tab" style="background:#F4F2F0;"><span class="av">🍇</span><span class="lbl">유진</span></div>
+        <div class="tab" style="background:#F4F2F0;"><span class="av">👩</span><span class="lbl">엄마</span></div>
+        <div class="tab" style="background:#F4F2F0;"><span class="av">👨</span><span class="lbl">아빠</span></div>
+      </div>
+      <div class="card" style="border:1px solid #DCC9EC; box-shadow:0 2px 10px rgba(124,82,150,.05);">
+        <h2 style="color:#3B3835;">🍇 포도알 받기 <button class="edit-btn" style="background:#F2E7DB; color:#A97C52;">항목 편집</button></h2>
+        <div class="prog" style="background:#F0EDF1;"><i></i></div>
+        <ul class="chk">
+          <li style="border-color:#F0EEEB;"><input type="checkbox" checked> 독해문제집 풀기</li>
+          <li style="border-color:#F0EEEB;"><input type="checkbox"> 방 정리하기</li>
+          <li style="border-color:#F0EEEB;"><input type="checkbox" checked> 학원 제 시간에 가기</li>
+        </ul>
+        <button class="btn">🍇 오늘 포도알 받기</button>
+      </div>
+    </div></div>
+  </div>
+
+</div>
+</body>
+</html>

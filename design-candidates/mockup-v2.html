@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포도알플래너 리뉴얼 시안 v2 — 라벤더 + 푸어스토리</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poor+Story&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #55506000; display: flex; justify-content: center; gap: 30px; padding: 24px; background: #3A3542; font-family: 'Poor Story', sans-serif; }
+  .note { color: #CFC9DC; font-size: 18px; text-align: center; padding: 8px 0 16px; }
+
+  .phone {
+    width: 400px; border-radius: 28px; overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,.5); background: #F1EFF6;
+  }
+  .screen { padding: 22px 18px 90px; position: relative; min-height: 860px; }
+
+  /* 헤더 */
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 4px 4px 0; }
+  .date { font-size: 24px; color: #555060; }
+  .gear { font-size: 22px; color: #6B6672; }
+
+  /* 구성원 아바타 */
+  .members { display: flex; justify-content: space-between; padding: 20px 8px 6px; }
+  .mem { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+  .mem .circ {
+    width: 74px; height: 74px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 40px;
+    background: #fff; border: 2.5px solid transparent;
+  }
+  .mem.active .circ { border-color: #8E62AC; background: #F4EFF8; }
+  .mem .circ.green { background: #EAF3E2; }
+  .mem .circ.pink { background: #FBEFEA; }
+  .mem .circ.blue { background: #E8F0F8; }
+  .mem.active .circ { background: #F1E9F7; }
+  .mem .nm { font-size: 19px; color: #555060; }
+  .mem.active .nm { color: #7C5296; font-weight: bold; }
+
+  /* 카드 공통 */
+  .card {
+    background: #fff; border-radius: 24px; padding: 20px 18px; margin-top: 16px;
+    box-shadow: 0 2px 12px rgba(124,82,150,.06);
+  }
+  .card .hd { display: flex; align-items: baseline; gap: 10px; }
+  .card .hd h2 { font-size: 26px; color: #3A3542; font-weight: normal; }
+  .card .hd .sub { font-size: 20px; color: #8E62AC; }
+  .card .hd .sub b { font-size: 22px; }
+  .card .hd .plus {
+    margin-left: auto; width: 40px; height: 40px; border-radius: 13px;
+    border: 1.5px solid #E3DCEE; background: #fff; color: #8E62AC;
+    font-size: 24px; display: flex; align-items: center; justify-content: center;
+  }
+
+  .prog { background: #EFEBF3; border-radius: 999px; height: 9px; margin: 14px 2px 6px; overflow: hidden; }
+  .prog i { display: block; height: 100%; width: 66%; background: #8E62AC; border-radius: 999px; }
+
+  /* 할 일 항목 박스 */
+  .todo {
+    display: flex; align-items: center; gap: 12px;
+    border: 1.5px solid #EEEAF2; border-radius: 16px; padding: 14px; margin-top: 12px;
+  }
+  .todo .chk {
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid #D9D3E2; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+  }
+  .todo.done .chk { background: #EFE7F6; border-color: #EFE7F6; color: #8E62AC; }
+  .todo .txt { font-size: 21px; color: #3A3542; }
+  .todo.done .txt { color: #B5AFC0; }
+  .todo .ico {
+    margin-left: auto; width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .ico.g { background: #EAF3E2; } .ico.y { background: #FBF0D8; } .ico.b { background: #E8F0F8; }
+
+  /* 포도알 모으기 */
+  .grape-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+  .masc { font-size: 44px; }
+  .bubble {
+    background: #F1EDF6; border-radius: 14px; padding: 10px 12px;
+    font-size: 18px; color: #555060; line-height: 1.35; position: relative;
+  }
+  .dots { margin-left: auto; display: grid; grid-template-columns: repeat(10, 15px); gap: 7px; }
+  .dots i { width: 15px; height: 15px; border-radius: 50%; background: #E9E5EE; }
+  .dots i.on { background: #8E62AC; }
+  .grape-btn-row { display: flex; justify-content: flex-end; margin-top: 14px; }
+  .grape-btn {
+    border: 1.5px solid #8E62AC; color: #7C5296; background: #fff;
+    border-radius: 13px; padding: 9px 22px; font-size: 21px; font-family: inherit;
+  }
+
+  /* 오늘 일정 */
+  .sched { display: flex; align-items: center; gap: 12px; padding: 12px 2px; border-bottom: 1px solid #F1EDF4; }
+  .sched:last-child { border-bottom: none; }
+  .sched .sico {
+    width: 38px; height: 38px; border-radius: 50%; background: #F1EDF6;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .sched .t { font-size: 22px; color: #3A3542; min-width: 64px; }
+  .sched .w { font-size: 21px; color: #555060; }
+
+  /* 하단 빠른 카드 */
+  .quick { display: flex; gap: 12px; margin-top: 16px; }
+  .qc {
+    flex: 1; background: #fff; border-radius: 20px; padding: 16px 0 13px;
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    box-shadow: 0 2px 12px rgba(124,82,150,.06);
+  }
+  .qc .qi {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 21px;
+  }
+  .qc .ql { font-size: 18px; color: #555060; }
+
+  /* 하단 내비게이션 */
+  .nav {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: #fff; border-radius: 24px 24px 0 0; box-shadow: 0 -3px 14px rgba(60,53,66,.08);
+    display: flex; padding: 10px 8px 14px;
+  }
+  .nav div { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 15px; color: #A6A0AF; }
+  .nav div.on { color: #7C5296; }
+  .nav .ni { font-size: 21px; }
+</style>
+</head>
+<body>
+<div>
+  <div class="note">리뉴얼 시안 v2 — 라벤더 배경 · 흰 카드 · 원형 아바타 · 푸어스토리 폰트</div>
+  <div class="phone"><div class="screen">
+
+    <div class="top">
+      <div class="date">7월 20일 월요일</div>
+      <div class="gear">⚙️</div>
+    </div>
+
+    <div class="members">
+      <div class="mem active"><div class="circ">🍇</div><div class="nm">준우</div></div>
+      <div class="mem"><div class="circ green">🍏</div><div class="nm">유진</div></div>
+      <div class="mem"><div class="circ pink">👩</div><div class="nm">엄마</div></div>
+      <div class="mem"><div class="circ blue">👨</div><div class="nm">아빠</div></div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>오늘 할 일</h2><span class="sub"><b>2</b>/3 완료</span><button class="plus">+</button></div>
+      <div class="prog"><i></i></div>
+      <div class="todo done"><div class="chk">✓</div><div class="txt">독해문제집 풀기</div><div class="ico g">📖</div></div>
+      <div class="todo"><div class="chk"></div><div class="txt">방 정리하기</div><div class="ico y">🗂️</div></div>
+      <div class="todo done"><div class="chk">✓</div><div class="txt">학원 제시간에 가기</div><div class="ico b">🕐</div></div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>포도알 모으기</h2><span class="sub" style="margin-left:auto;"><b>12</b> / 30</span></div>
+      <div class="grape-row">
+        <div class="masc">🍇</div>
+        <div class="bubble">오늘도 할 일<br>모아볼까요?</div>
+        <div class="dots">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i>
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+      </div>
+      <div class="grape-btn-row"><button class="grape-btn">포도알 받기</button></div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>오늘 일정</h2></div>
+      <div style="margin-top:8px;">
+        <div class="sched"><div class="sico">🕘</div><div class="t">09:00</div><div class="w">수학학원</div></div>
+        <div class="sched"><div class="sico">🦷</div><div class="t">16:30</div><div class="w">치과 예약</div></div>
+      </div>
+    </div>
+
+    <div class="quick">
+      <div class="qc"><div class="qi" style="background:#EAF3E2;">📅</div><div class="ql">달력</div></div>
+      <div class="qc"><div class="qi" style="background:#F1EDF6;">🗓️</div><div class="ql">시간표</div></div>
+      <div class="qc"><div class="qi" style="background:#FBF0D8;">📒</div><div class="ql">전화번호부</div></div>
+    </div>
+
+    <div class="nav">
+      <div class="on"><span class="ni">🏠</span>홈</div>
+      <div><span class="ni">✅</span>할 일</div>
+      <div><span class="ni">🍇</span>포도</div>
+      <div><span class="ni">📅</span>달력</div>
+      <div><span class="ni">⋯</span>더보기</div>
+    </div>
+
+  </div></div>
+</div>
+</body>
+</html>

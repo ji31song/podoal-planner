@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>포도알플래너 폰트 비교 2 — 얇고 귀여운 폰트</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gaegu&family=Hi+Melody&family=Cute+Font&family=Dongle:wght@400;700&family=Poor+Story&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #2F2D2A; font-family: sans-serif; padding: 24px; }
+  .grid { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+  .phone { width: 330px; border-radius: 24px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,.4); }
+  .label { text-align: center; color: #fff; font-size: 15px; font-weight: 800; padding: 10px 0 14px; font-family: sans-serif; }
+  .label small { display: block; font-weight: 400; color: #bbb; margin-top: 3px; font-size: 12px; }
+  .screen { padding: 20px 14px 24px; height: 560px; background: #FFFFFF; color: #6B6661; }
+  header { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 8px 4px; }
+  .hero { font-size: 44px; }
+  h1 { font-weight: 600; letter-spacing: -0.3px; color: #3B3835; }
+  .today { margin-top: 4px; color: #A5A09A; }
+  .tabs { display: flex; gap: 7px; margin-top: 12px; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0 7px; border-radius: 15px; background: #F4F2F0; }
+  .tab.active { background: #8E62AC; color: #fff; }
+  .tab .av { font-size: 26px; }
+  .tab .lbl { font-weight: 600; }
+  .card { background: #fff; border-radius: 18px; padding: 14px; margin-top: 12px; border: 1px solid #DCC9EC; box-shadow: 0 2px 10px rgba(124,82,150,.05); }
+  .card h2 { font-weight: 600; display: flex; align-items: center; gap: 6px; color: #3B3835; }
+  .edit-btn { margin-left: auto; font-weight: 600; padding: 4px 10px; border-radius: 999px; border: none; background: #F2E7DB; color: #A97C52; font-family: inherit; }
+  .prog { border-radius: 999px; height: 8px; margin: 12px 0 6px; overflow: hidden; background: #F0EDF1; }
+  .prog i { display: block; height: 100%; width: 66%; background: #8E62AC; border-radius: 999px; }
+  .pct { text-align: right; color: #A5A09A; }
+  .chk { list-style: none; padding: 0; margin-top: 6px; }
+  .chk li { display: flex; align-items: center; gap: 8px; padding: 8px 2px; border-bottom: 1px solid #F0EEEB; }
+  .chk input { accent-color: #8E62AC; width: 15px; height: 15px; }
+  .btn { width: 100%; border: none; margin-top: 12px; padding: 12px; color: #fff; font-weight: 600; border-radius: 13px; background: linear-gradient(135deg, #9268B0, #7C5296); font-family: inherit; }
+</style>
+</head>
+<body>
+<div class="grid"></div>
+<script>
+  // [이름, 설명, font-family, 크기배율] — Dongle/Cute Font는 글자가 작게 나오는 폰트라 배율 보정
+  const FONTS = [
+    ["1. 고운돋움", "동화책 같은 부드러움, 또박또박", "'Gowun Dodum', sans-serif", 1.0],
+    ["2. 개구", "크레용 낙서 느낌, 밝고 장난스러움", "'Gaegu', cursive", 1.12],
+    ["3. 하이멜로디", "몽글몽글 귀여운 손글씨", "'Hi Melody', cursive", 1.12],
+    ["4. 동글", "동글동글 말랑한 라운드", "'Dongle', sans-serif", 1.45],
+    ["5. 푸어스토리", "동화 구연 느낌의 손글씨", "'Poor Story', cursive", 1.12],
+    ["6. Pretendard 얇게", "표준 폰트를 가는 굵기로", "'Pretendard Variable', sans-serif", 1.0],
+  ];
+  const grid = document.querySelector(".grid");
+  for (const [name, desc, family, scale] of FONTS) {
+    const fs = (base) => Math.round(base * scale) + "px";
+    const d = document.createElement("div");
+    d.innerHTML = `
+    <div class="label">${name} <small>${desc}</small></div>
+    <div class="phone"><div class="screen" style="font-family:${family.replace(/"/g,'&quot;')};">
+      <header><span class="hero">🍇</span><div><h1 style="font-size:${fs(22)};">행복패밀리</h1><div class="today" style="font-size:${fs(13)};">오늘은 7월 20일 (월)</div></div></header>
+      <div class="tabs">
+        <div class="tab active"><span class="av">🍇</span><span class="lbl" style="font-size:${fs(13)};">준우</span></div>
+        <div class="tab"><span class="av">🍇</span><span class="lbl" style="font-size:${fs(13)};">유진</span></div>
+        <div class="tab"><span class="av">👩</span><span class="lbl" style="font-size:${fs(13)};">엄마</span></div>
+        <div class="tab"><span class="av">👨</span><span class="lbl" style="font-size:${fs(13)};">아빠</span></div>
+      </div>
+      <div class="card">
+        <h2 style="font-size:${fs(16)};">🍇 포도알 받기 <button class="edit-btn" style="font-size:${fs(12)};">항목 편집</button></h2>
+        <div class="prog"><i></i></div>
+        <div class="pct" style="font-size:${fs(12)};">2 / 3 완료 (67%)</div>
+        <ul class="chk">
+          <li style="font-size:${fs(14)};"><input type="checkbox" checked> 독해문제집 풀기</li>
+          <li style="font-size:${fs(14)};"><input type="checkbox"> 방 정리하기</li>
+          <li style="font-size:${fs(14)};"><input type="checkbox" checked> 학원 제 시간에 가기</li>
+        </ul>
+        <button class="btn" style="font-size:${fs(14)};">🍇 오늘 포도알 받기</button>
+      </div>
+    </div></div>`;
+    grid.appendChild(d);
+  }
+</script>
+</body>
+</html>

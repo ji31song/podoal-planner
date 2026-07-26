@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포도알플래너 리뉴얼 시안 v4 — 실제 앱 구성</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poor+Story&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #3A3542; font-family: 'Poor Story', sans-serif;
+    display: flex; flex-direction: column; align-items: center; padding: 24px;
+  }
+  .note { color: #CFC9DC; font-size: 16px; text-align: center; padding: 0 0 16px; }
+  .phone {
+    width: 402px; border-radius: 30px; overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,.5); background: #F7F6F9;
+  }
+  .screen { padding: 24px 16px 28px; }
+
+  /* ── 헤더: [아이콘 가족이름 ..... 설정] 한 줄 ── */
+  header { display: flex; align-items: center; justify-content: center; gap: 9px; padding: 2px 4px; position: relative; }
+  header .hero { width: 38px; height: 38px; object-fit: contain; }
+  header h1 { font-size: 19px; color: #3A3542; font-weight: normal; letter-spacing: -0.3px; }
+  header .gear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 21px; height: 21px; stroke: #8B8595; }
+  .today-line { font-size: 12px; color: #A9A3B3; padding: 8px 6px 0; }
+
+  /* ── 구성원 탭 (원형 아바타) ── */
+  .tabs { display: flex; justify-content: space-between; padding: 16px 10px 2px; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 70px; background: none; border: none; font-family: inherit; cursor: pointer; }
+  .tab .circ {
+    width: 60px; height: 60px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 2px solid transparent;
+    box-shadow: 0 2px 8px rgba(90,70,120,.06);
+  }
+  .tab .circ img { width: 42px; height: 42px; object-fit: contain; }
+  .tab.active .circ { border-color: #7C5296; background: #F3EDF9; }
+  .tab .circ.c-green { background: #EDF4DF; }
+  .tab .circ.c-pink  { background: #FBEEE9; }
+  .tab .circ.c-blue  { background: #E9F1F8; }
+  .tab .nm { font-size: 13px; color: #6E6878; }
+  .tab.active .nm { color: #7C5296; }
+
+  /* ── 카드 공통 ── */
+  .card {
+    background: #fff; border-radius: 20px; padding: 18px 16px; margin-top: 14px;
+    box-shadow: 0 2px 14px rgba(90,70,120,.07);
+  }
+  .card h2 { display: flex; align-items: center; gap: 8px; font-weight: normal; }
+  .card h2 .ico { width: 26px; height: 26px; object-fit: contain; }
+  .card h2 .tt { font-size: 17px; color: #3A3542; letter-spacing: -0.3px; }
+  .card h2 .masc { margin-left: auto; width: 34px; height: 34px; object-fit: contain; }
+  .edit-btn {
+    border: 1.5px solid #E6E1EE; background: #fff; color: #7C5296;
+    border-radius: 999px; padding: 5px 12px; font-size: 11px; font-family: inherit; cursor: pointer;
+  }
+  .card h2 .masc + .edit-btn { margin-left: 8px; }
+  .card h2 .edit-btn:only-of-type { margin-left: auto; }
+
+  /* ── 날짜 이동 ── */
+  .date-nav { display: flex; align-items: center; gap: 8px; margin-top: 9px; }
+  .date-nav.center { justify-content: center; position: relative; }
+  .date-nav.center .edit-btn { position: absolute; right: 0; margin-left: 0 !important; }
+  .date-nav .nav-b {
+    width: 30px; height: 30px; border: none; border-radius: 10px;
+    background: #F1EDF6; color: #7C5296; font-size: 11px; cursor: pointer; font-family: inherit;
+  }
+  .date-nav .cur { font-size: 14px; color: #3A3542; padding: 0 4px; }
+  .date-nav .today-btn {
+    margin-left: auto; border: none; background: #EFE7F6; color: #7C5296;
+    border-radius: 999px; padding: 6px 14px; font-size: 12px; font-family: inherit; cursor: pointer;
+  }
+
+  .prog { background: #ECE8F1; border-radius: 999px; height: 8px; margin: 9px 2px 3px; overflow: hidden; }
+  .prog i { display: block; height: 100%; width: 66%; background: #7C5296; border-radius: 999px; }
+  .prog-label { font-size: 11px; color: #A9A3B3; text-align: right; }
+
+  /* ── 체크리스트 ── */
+  .todo {
+    display: flex; align-items: center; gap: 11px;
+    border: 1.5px solid #EDEAF2; border-radius: 15px;
+    padding: 8px 12px; margin-top: 7px;
+  }
+  .todo .chk {
+    width: 25px; height: 25px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid #DDD7E5; background: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .todo.done .chk { background: #EFE7F6; border-color: #EFE7F6; }
+  .todo .chk svg { width: 13px; height: 13px; stroke: #7C5296; display: none; }
+  .todo.done .chk svg { display: block; }
+  .todo .txt { font-size: 14px; color: #3A3542; }
+  .todo.done .txt { color: #B9B3C4; }
+
+  /* ── 할 일 추가 줄 (항상 표시) ── */
+  .add-row { display: flex; gap: 8px; margin-top: 9px; }
+  .add-row input {
+    flex: 1; min-width: 0; border: 1.5px solid #EDEAF2; background: #FBFAFC;
+    border-radius: 12px; padding: 8px 12px; font-size: 13px; font-family: inherit; outline: none;
+  }
+  .add-row input::placeholder { color: #C4BECE; }
+  .add-row button {
+    border: none; background: #7C5296; color: #fff; border-radius: 12px;
+    padding: 8px 16px; font-size: 13px; font-family: inherit; cursor: pointer;
+  }
+
+  /* ── 포도알 받기 버튼 + 포도판 ── */
+  .grape-btn-row { margin-top: 10px; }
+  .grape-btn {
+    width: 100%; border: 1.5px solid #7C5296; color: #7C5296; background: #fff;
+    border-radius: 14px; padding: 9px; font-size: 14px; font-family: inherit; cursor: pointer;
+  }
+  .board-cap { font-size: 12px; color: #6E6878; margin-top: 11px; }
+  .board-cap b { color: #7C5296; font-weight: normal; font-size: 13px; }
+  .grape-board { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px 6px; margin-top: 7px; }
+  .gcell { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .gcell .gnum { font-size: 8.5px; color: #C4BECE; }
+  .gcell .g { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 1.5px dashed #D9D3E2; background: #F6F4F9; }
+  .gcell .g.on { border: none; background: none; }
+  .gcell .g img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+  /* ── 시간표 (원래 앱 디자인 유지, 폰트만 변경) ── */
+  .sched-wrap { display: flex; gap: 12px; margin-top: 12px; align-items: flex-start; }
+  .sched-list { flex: 3; min-width: 0; border: 1px solid #B8B4AC; border-radius: 6px; overflow: hidden; }
+  .sched { display: flex; align-items: stretch; gap: 8px; padding: 0 6px 0 0; border-bottom: 1px solid #B8B4AC; height: 38px; overflow: hidden; }
+  .sched.head { height: 30px; }
+  .sched:last-child { border-bottom: none; }
+  .sched.head { min-height: 30px; background: #F1EEE9; font-size: 11px; color: #8B8680; align-items: center; }
+  .sched.head .hl { flex: 1; text-align: center; }
+  .sched.head .ht { flex: 0 0 64px; border-right: 1px solid transparent; text-align: center; }
+  .sched .t {
+    flex: 0 0 64px; border-right: 1px solid #B8B4AC;
+    display: flex; flex-direction: column; justify-content: center; text-align: center;
+    font-size: 10px; color: #4A7DB5; line-height: 1.4;
+  }
+  .sched .w { flex: 1; min-width: 0; font-size: 13px; color: #2F2D2A; padding: 8px 2px; align-self: center; }
+  .sched .t .ph { color: #C8C4BD; font-size: 9px; line-height: 1.5; }
+  .sched-hint { font-size: 11px; color: #A5A09A; margin-top: 10px; }
+  .vt-col { flex: 0 0 75px; }
+  .vt-head {
+    height: 30px; background: #F1EEE9; border: 1px solid #B8B4AC; border-bottom: none;
+    border-radius: 6px 6px 0 0; font-size: 11px; color: #8B8680;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .vt { position: relative; border: 1px solid #B8B4AC; border-radius: 0 0 6px 6px; overflow: hidden; }
+  .vt-divider { position: absolute; top: 0; bottom: 0; left: 22px; border-left: 1px solid #B8B4AC; }
+  .vt-line { position: absolute; left: 0; right: 0; border-top: 1px solid #B8B4AC; }
+  .vt-label { position: absolute; left: 0; width: 22px; transform: translateY(-50%); font-size: 9px; color: #6B6661; text-align: center; }
+  .vt-bar {
+    position: absolute; left: 25px; right: 3px; border-radius: 3px;
+    font-size: 8px; padding: 1px 3px; overflow: hidden;
+    white-space: nowrap; text-overflow: ellipsis; line-height: 1.2;
+  }
+
+  /* ── 달력 ── */
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 12px; }
+  .cal .dow { font-size: 11px; color: #A9A3B3; text-align: center; padding: 3px 0; }
+  .cal .dow.sun { color: #D98B8B; }
+  .cal .cell {
+    aspect-ratio: 0.8; border-radius: 6px; background: #FBFAFC; border: 1px solid #F2EFF5;
+    display: flex; flex-direction: column; align-items: center; padding: 4px 2px 2px; gap: 2px; overflow: hidden;
+  }
+  .cal .cell.dim { opacity: 0; }
+  .cal .cell .n { font-size: 11px; color: #6E6878; width: 19px; height: 19px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .cal .cell.sun .n { color: #D98B8B; }
+  .cal .cell.today .n { background: #7C5296; color: #fff; }
+  .cal .cell .evt {
+    width: 100%; font-size: 8.5px; line-height: 1.35; border-radius: 5px; padding: 1px 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
+  }
+  .memo { margin-top: 12px; font-size: 13px; color: #3A3542; background: #F6F4F9; border-radius: 12px; padding: 10px 12px; }
+  .memo b { color: #7C5296; font-weight: normal; }
+
+  /* ── 전화번호부 ── */
+  .ph { display: flex; align-items: center; gap: 10px; padding: 11px 4px; border-bottom: 1px solid #F2EFF5; }
+  .ph:last-child { border-bottom: none; }
+  .ph .pn { font-size: 14px; color: #3A3542; }
+  .ph .pd { font-size: 12px; color: #A9A3B3; margin-left: auto; }
+  .ph .call {
+    border: none; background: #EDF4DF; color: #7FA355; border-radius: 10px;
+    padding: 7px 14px; font-size: 12px; font-family: inherit; cursor: pointer;
+  }
+
+  footer { text-align: center; font-size: 11px; color: #B9B3C4; padding: 18px 0 4px; }
+</style>
+</head>
+<body>
+  <div class="note">리뉴얼 시안 v4 — 실제 앱 구성 그대로 + 라벤더 스킨 + 푸어스토리</div>
+  <div class="phone"><div class="screen">
+
+    <header>
+      <img class="hero" src="assets/hero-new.png" alt="">
+      <h1>행복패밀리</h1>
+      <svg class="gear" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </header>
+
+    <div class="tabs">
+      <button class="tab active"><span class="circ"><img src="assets/img-09.png" alt=""></span><span class="nm">준우</span></button>
+      <button class="tab"><span class="circ c-green"><img src="assets/img-09-green.png" alt=""></span><span class="nm">유진</span></button>
+      <button class="tab"><span class="circ c-pink"><img src="assets/img-12.png" alt=""></span><span class="nm">엄마</span></button>
+      <button class="tab"><span class="circ c-blue"><img src="assets/img-11.png" alt=""></span><span class="nm">아빠</span></button>
+    </div>
+    <div class="today-line">오늘은 7월 20일 (월)</div>
+
+    <!-- 포도알 받기 -->
+    <section class="card">
+      <h2>
+        <img class="ico" src="assets/img-16.png" alt=""><span class="tt">포도알 받기</span>
+        <button class="edit-btn" style="margin-left:auto;">항목 편집</button>
+      </h2>
+      <div class="date-nav center">
+        <button class="nav-b">◀</button>
+        <span class="cur">7월 20일 (월)</span>
+        <button class="nav-b">▶</button>
+      </div>
+      <div class="prog"><i></i></div>
+      <div class="prog-label">2 / 3 완료 (67%)</div>
+      <div class="todo done">
+        <div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="txt">독해문제집 풀기</div>
+      </div>
+      <div class="todo">
+        <div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="txt">방 정리하기</div>
+      </div>
+      <div class="todo done">
+        <div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="txt">학원 제 시간에 가기</div>
+      </div>
+      <div class="add-row"><input placeholder="새 할 일 입력"><button>추가</button></div>
+      <div class="grape-btn-row"><button class="grape-btn">🍇 오늘 포도알 받기</button></div>
+      <div class="board-cap" id="boardCap" style="cursor:pointer; user-select:none;">이번 판 포도알 <b>4개</b> (30개 모으면 포도송이 완성) <span id="boardChev" style="font-size:10px; color:#A9A3B3;">▼</span></div>
+      <div class="grape-board" id="board" style="display:none;"></div>
+    </section>
+
+    <!-- 하루 시간표 -->
+    <section class="card">
+      <div class="date-nav center" style="margin-top:0;">
+        <button class="nav-b">◀</button>
+        <span class="cur">7월 20일 (월)</span>
+        <button class="nav-b">▶</button>
+        <button class="edit-btn">항목 편집</button>
+      </div>
+      <div class="sched-wrap">
+        <div class="sched-list">
+          <div class="sched head"><span class="ht">시간</span><span class="hl">해야 할 일</span></div>
+          <div class="sched"><div class="t">09:00<br>10:30</div><div class="w">태권도 학원</div></div>
+          <div class="sched"><div class="t">14:00</div><div class="w">피아노 연습</div></div>
+          <div class="sched"><div class="t">16:00<br>17:00</div><div class="w">놀이터에서 놀기</div></div>
+          <div class="sched"><div class="t"><span class="ph">시작시간<br>종료시간</span></div><div class="w"></div></div>
+          <div class="sched"><div class="t"><span class="ph">시작시간<br>종료시간</span></div><div class="w"></div></div>
+          <div class="sched"><div class="t"><span class="ph">시작시간<br>종료시간</span></div><div class="w"></div></div>
+          <div class="sched"><div class="t"><span class="ph">시작시간<br>종료시간</span></div><div class="w"></div></div>
+          <div class="sched"><div class="t"><span class="ph">시작시간<br>종료시간</span></div><div class="w"></div></div>
+          <div class="sched"><div class="t"><span class="ph">시작시간<br>종료시간</span></div><div class="w"></div></div>
+          <div class="sched"><div class="t"><span class="ph">시작시간<br>종료시간</span></div><div class="w"></div></div>
+        </div>
+        <div class="vt-col">
+          <div class="vt-head">타임라인</div>
+          <div class="vt" id="vt" style="height:384px;"><div class="vt-divider"></div></div>
+        </div>
+      </div>
+      <div class="sched-hint">시간은 숫자로 입력하세요 · 예) 930 → 09:30, 1830 → 18:30</div>
+    </section>
+
+    <!-- 달력 -->
+    <section class="card">
+      <div class="date-nav center" style="margin-top:0;">
+        <button class="nav-b">◀</button>
+        <span class="cur">2026년 7월</span>
+        <button class="nav-b">▶</button>
+      </div>
+      <div class="cal" id="cal"></div>
+      <div class="memo"><b>7월 20일</b> · 가족 나들이 🧺</div>
+    </section>
+
+    <!-- 전화번호부 -->
+    <section class="card">
+      <h2>
+        <img class="ico" src="assets/img-08.png" alt=""><span class="tt">전화번호부</span>
+        <button class="edit-btn" style="margin-left:auto;">항목 편집</button>
+      </h2>
+      <div style="margin-top:6px;">
+        <div class="ph"><div class="pn">학교 교무실</div><div class="pd">02-1234-5678</div><button class="call">📞 전화</button></div>
+        <div class="ph"><div class="pn">태권도장</div><div class="pd">031-234-5678</div><button class="call">📞 전화</button></div>
+      </div>
+    </section>
+
+    <footer>달력에서 날짜를 누르면 바로 메모를 쓸 수 있어요</footer>
+
+  </div></div>
+
+<script>
+  // 포도판: 1~30, 4개 획득
+  const board = document.getElementById("board");
+  const grapes = ["img-13", "img-14", "img-15", "img-16"];
+  for (let i = 1; i <= 30; i++) {
+    const c = document.createElement("div");
+    c.className = "gcell";
+    const on = i <= 4;
+    c.innerHTML = `<span class="gnum">${i}</span><span class="g${on ? " on" : ""}">${on ? `<img src="assets/${grapes[(i-1) % 4]}.png" alt="">` : ""}</span>`;
+    board.appendChild(c);
+  }
+  // 포도판 접기/펼치기
+  document.getElementById("boardCap").addEventListener("click", () => {
+    const b = document.getElementById("board");
+    const open = b.style.display === "none";
+    b.style.display = open ? "grid" : "none";
+    document.getElementById("boardChev").textContent = open ? "▲" : "▼";
+  });
+
+  // 타임라인: 8시~24시, PPH 24px (실제 앱 로직과 동일)
+  const vt = document.getElementById("vt");
+  const PPH = 24, dayStart = 8;
+  let vtHtml = '<div class="vt-divider"></div>';
+  for (let h = dayStart + 1; h < 24; h++) vtHtml += `<div class="vt-line" style="top:${(h - dayStart) * PPH}px"></div>`;
+  for (let h = dayStart; h < 24; h++) vtHtml += `<span class="vt-label" style="top:${(h - dayStart) * PPH + PPH / 2}px">${h}</span>`;
+  const bars = [
+    { s: 9, e: 10.5, text: "태권도 학원", bg: "#EFE7F6", fg: "#7C5296" },
+    { s: 14, e: 15, text: "피아노 연습", bg: "#EDF4DF", fg: "#7FA355" },
+    { s: 16, e: 17, text: "놀이터에서 놀기", bg: "#FBF3D9", fg: "#A9853F" },
+  ];
+  for (const b of bars) vtHtml += `<div class="vt-bar" style="top:${(b.s - dayStart) * PPH + 1}px; height:${(b.e - b.s) * PPH - 2}px; background:${b.bg}; color:${b.fg}; border:1px solid ${b.fg}55">${b.text}</div>`;
+  vt.innerHTML = vtHtml;
+
+  // 달력: 2026년 7월 (수요일 시작), 20일 오늘 — 현재 구성원(준우)의 일정만 텍스트 칩으로 표시
+  const cal = document.getElementById("cal");
+  ["일","월","화","수","목","금","토"].forEach((d, i) => { const e = document.createElement("div"); e.className = "dow" + (i === 0 ? " sun" : ""); e.textContent = d; cal.appendChild(e); });
+  for (let i = 0; i < 3; i++) { const e = document.createElement("div"); e.className = "cell dim"; cal.appendChild(e); }
+  const evts = {
+    20: [{ t: "가족 나들이 🧺", bg: "#EFE7F6", fg: "#7C5296" }],
+    23: [{ t: "할머니 댁 방문", bg: "#EDF4DF", fg: "#7FA355" }],
+    27: [{ t: "학교 방학식", bg: "#FBF0D8", fg: "#A97C52" }],
+  };
+  for (let d = 1; d <= 31; d++) {
+    const e = document.createElement("div");
+    const dow = (3 + d - 1) % 7;
+    e.className = "cell" + (d === 20 ? " today" : "") + (dow === 0 ? " sun" : "");
+    e.innerHTML = `<span class="n">${d}</span>` + (evts[d] || []).map(v => `<span class="evt" style="background:${v.bg}; color:${v.fg}">${v.t}</span>`).join("");
+    cal.appendChild(e);
+  }
+</script>
+</body>
+</html>

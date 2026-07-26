@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포도알플래너 리뉴얼 시안 v3 — 실제 에셋</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poor+Story&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #3A3542; font-family: 'Poor Story', sans-serif;
+    display: flex; flex-direction: column; align-items: center; padding: 24px;
+  }
+  .note { color: #CFC9DC; font-size: 19px; text-align: center; padding: 0 0 16px; }
+
+  .phone {
+    width: 402px; border-radius: 30px; overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,.5); background: #F1EFF5;
+  }
+  .screen { padding: 26px 20px 30px; }
+
+  /* ── 상단 ── */
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+  .date { font-size: 19px; color: #555060; letter-spacing: -0.3px; }
+  .gear { width: 21px; height: 21px; stroke: #8B8595; }
+
+  /* ── 구성원 ── */
+  .members { display: flex; justify-content: space-between; padding: 20px 10px 2px; }
+  .mem { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 70px; }
+  .mem .circ {
+    width: 60px; height: 60px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 2px solid transparent;
+    box-shadow: 0 2px 8px rgba(90,70,120,.06);
+  }
+  .mem .circ img { width: 42px; height: 42px; object-fit: contain; }
+  .mem.active .circ { border-color: #8E62AC; background: #F3EDF9; }
+  .mem .circ.c-green { background: #EDF5E6; }
+  .mem .circ.c-pink  { background: #FBEEE9; }
+  .mem .circ.c-blue  { background: #E9F1F8; }
+  .mem .nm { font-size: 15px; color: #6E6878; }
+  .mem.active .nm { color: #7C5296; }
+
+  /* ── 카드 공통 ── */
+  .card {
+    background: #fff; border-radius: 22px; padding: 18px 16px; margin-top: 14px;
+    box-shadow: 0 2px 14px rgba(90,70,120,.07);
+  }
+  .hd { display: flex; align-items: center; gap: 10px; }
+  .hd h2 { font-size: 20px; color: #3A3542; font-weight: normal; letter-spacing: -0.3px; }
+  .hd .cnt { font-size: 15px; color: #A9A3B3; }
+  .hd .cnt b { font-size: 18px; color: #8E62AC; font-weight: normal; }
+  .plus {
+    margin-left: auto; width: 32px; height: 32px; border-radius: 11px;
+    border: 1.5px solid #E6E1EE; background: #fff; color: #8E62AC;
+    font-size: 20px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .prog { background: #ECE8F1; border-radius: 999px; height: 8px; margin: 13px 2px 2px; overflow: hidden; }
+  .prog i { display: block; height: 100%; width: 66%; background: #8E62AC; border-radius: 999px; }
+
+  /* ── 할 일 ── */
+  .todo {
+    display: flex; align-items: center; gap: 11px;
+    border: 1.5px solid #EDEAF2; border-radius: 15px;
+    padding: 11px 13px; margin-top: 10px;
+  }
+  .todo .chk {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid #DDD7E5; background: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .todo.done .chk { background: #EFE7F6; border-color: #EFE7F6; }
+  .todo .chk svg { width: 13px; height: 13px; stroke: #8E62AC; display: none; }
+  .todo.done .chk svg { display: block; }
+  .todo .txt { font-size: 16px; color: #3A3542; }
+  .todo.done .txt { color: #B9B3C4; }
+
+  /* ── 포도알 모으기 ── */
+  .grape-row { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
+  .masc { width: 54px; height: 54px; object-fit: contain; flex-shrink: 0; }
+  .dots { flex: 1; display: grid; grid-template-columns: repeat(10, 1fr); gap: 7px 6px; }
+  .dots span { width: 100%; aspect-ratio: 1; }
+  .dots span img { width: 100%; height: 100%; object-fit: contain; }
+  .dots span.off { border: 1.5px dashed #D9D3E2; border-radius: 50%; background: #F6F4F9; }
+  .grape-foot { display: flex; align-items: center; margin-top: 13px; }
+  .grape-foot .left { font-size: 13px; color: #A9A3B3; }
+  .grape-btn {
+    margin-left: auto; border: 1.5px solid #8E62AC; color: #7C5296; background: #fff;
+    border-radius: 11px; padding: 7px 18px; font-size: 15px; font-family: inherit; cursor: pointer;
+  }
+
+  /* ── 오늘 일정 ── */
+  .sched { display: flex; align-items: center; gap: 12px; padding: 10px 4px; border-bottom: 1px solid #F2EFF5; }
+  .sched:last-child { border-bottom: none; padding-bottom: 2px; }
+  .sched .t { font-size: 16px; color: #7C5296; min-width: 52px; }
+  .sched .w { font-size: 16px; color: #3A3542; }
+
+  /* ── 빠른 카드 ── */
+  .quick { display: flex; gap: 11px; margin-top: 14px; }
+  .qc {
+    flex: 1; background: #fff; border-radius: 18px; padding: 14px 0 11px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    box-shadow: 0 2px 14px rgba(90,70,120,.07);
+  }
+  .qc img { width: 30px; height: 30px; object-fit: contain; }
+  .qc .ql { font-size: 14px; color: #555060; }
+</style>
+</head>
+<body>
+  <div class="note">리뉴얼 시안 v3 — 라벤더 배경 · 실제 앱 에셋 · 푸어스토리</div>
+  <div class="phone"><div class="screen">
+
+    <div class="top">
+      <div class="date">7월 20일 월요일</div>
+      <svg class="gear" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
+
+    <div class="members">
+      <div class="mem active"><div class="circ"><img src="assets/img-09.png" alt=""></div><div class="nm">준우</div></div>
+      <div class="mem"><div class="circ c-green"><img src="assets/img-10.png" alt=""></div><div class="nm">유진</div></div>
+      <div class="mem"><div class="circ c-pink"><img src="assets/img-12.png" alt=""></div><div class="nm">엄마</div></div>
+      <div class="mem"><div class="circ c-blue"><img src="assets/img-11.png" alt=""></div><div class="nm">아빠</div></div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>오늘 할 일</h2><span class="cnt"><b>2</b>/3 완료</span><button class="plus">+</button></div>
+      <div class="prog"><i></i></div>
+      <div class="todo done">
+        <div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="txt">독해문제집 풀기</div>
+      </div>
+      <div class="todo">
+        <div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="txt">방 정리하기</div>
+      </div>
+      <div class="todo done">
+        <div class="chk"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="txt">학원 제시간에 가기</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>포도알 모으기</h2><span class="cnt" style="margin-left:auto;"><b>7</b> / 30</span></div>
+      <div class="grape-row">
+        <img class="masc" src="assets/img-03.png" alt="">
+        <div class="dots">
+          <span><img src="assets/img-13.png" alt=""></span>
+          <span><img src="assets/img-14.png" alt=""></span>
+          <span><img src="assets/img-15.png" alt=""></span>
+          <span><img src="assets/img-16.png" alt=""></span>
+          <span><img src="assets/img-13.png" alt=""></span>
+          <span><img src="assets/img-14.png" alt=""></span>
+          <span><img src="assets/img-15.png" alt=""></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+          <span class="off"></span>
+        </div>
+      </div>
+      <div class="grape-foot">
+        <span class="left">30개를 모으면 포도송이 완성!</span>
+        <button class="grape-btn">포도알 받기</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h2>오늘 일정</h2></div>
+      <div style="margin-top:10px;">
+        <div class="sched"><div class="t">09:00</div><div class="w">수학학원</div></div>
+        <div class="sched"><div class="t">16:30</div><div class="w">치과 예약</div></div>
+      </div>
+    </div>
+
+    <div class="quick">
+      <div class="qc"><img src="assets/img-07.png" alt=""><div class="ql">달력</div></div>
+      <div class="qc"><img src="assets/img-06.png" alt=""><div class="ql">시간표</div></div>
+      <div class="qc"><img src="assets/img-08.png" alt=""><div class="ql">전화번호부</div></div>
+    </div>
+
+  </div></div>
+</body>
+</html>
