@@ -2046,8 +2046,8 @@ function renderPhonebook() {
     }
     ul.appendChild(li);
   });
-  document.getElementById("phoneAddRow1").style.display = canEdit && editingPhone ? "flex" : "none";
-  document.getElementById("phoneAddRow2").style.display = canEdit && editingPhone ? "flex" : "none";
+  document.getElementById("phoneAddRow1").style.display = canEdit ? "flex" : "none";
+  document.getElementById("phoneAddRow2").style.display = canEdit ? "flex" : "none";
   const pBtn = document.getElementById("editPhoneBtn");
   pBtn.style.display = canEdit ? "" : "none";
   pBtn.textContent = editingPhone ? "완료" : "항목 편집";
