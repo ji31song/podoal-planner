@@ -1629,9 +1629,7 @@ function renderGrapes(done, total) {
       } else {
         html += `<div class="grape-done">엄마·아빠에게 포도알 요청 알림이 갔어요 💌<br>승인을 기다리고 있어요</div>`;
       }
-    } else if (canRewardMember(m)) {
-      html += `<button class="grape-btn" id="giveGrapeBtn">다 했어요! 포도알 주세요</button>`;
-    } else if (isSelfChild) {
+    } else if (canRewardMember(m) || isSelfChild) {
       html += `<button class="grape-btn" id="requestGrapeBtn">다 했어요! 포도알 주세요</button>`;
     }
   }
@@ -1664,6 +1662,11 @@ function renderGrapes(done, total) {
   const reqBtn = document.getElementById("requestGrapeBtn");
   if (reqBtn) reqBtn.addEventListener("click", () => {
     store.write(`people/${m.id}/grapeRequests/${selectedDate}`, true);
+    // 어른(엄마·아빠) Comment 영역에 요청 한마디 자동 남기기
+    for (const a of members().filter(mm => mm.role === "adult")) {
+      const arr = (personOf(a.id).comments || {})[selectedDate] || [];
+      store.write(`people/${a.id}/comments/${selectedDate}`, [...arr, { who: m.name, text: "다했어요. 포도알 주세요 🍇" }]);
+    }
   });
   document.getElementById("grapeToggle").addEventListener("click", () => {
     grapeBoardOpen = !grapeBoardOpen;
