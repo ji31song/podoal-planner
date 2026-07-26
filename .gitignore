@@ -32,3 +32,4 @@ firebase-token*.txt
 .idea/
 .vscode/
 !store-assets/screenshots/*.png
+!design-candidates/assets/*.png
