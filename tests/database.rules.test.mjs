@@ -163,6 +163,12 @@ describe("보상·댓글·전화번호부 권한", () => {
     await assertSucceeds(set(ref(db("adultA"), "families/familyA/people/childMember/grapes/2026-07-17"), true));
   });
 
+  test("아이는 자기 포도알 요청을 만들 수 있고 어른은 요청을 지울 수 있다", async () => {
+    await assertSucceeds(set(ref(db("childA"), "families/familyA/people/childMember/grapeRequests/2026-07-18"), true));
+    await assertFails(set(ref(db("childA"), "families/familyA/people/siblingMember/grapeRequests/2026-07-18"), true));
+    await assertSucceeds(set(ref(db("adultA"), "families/familyA/people/childMember/grapeRequests/2026-07-18"), null));
+  });
+
   test("한마디는 어른 탭에만 남길 수 있다", async () => {
     await assertSucceeds(set(ref(db("childA"), "families/familyA/people/adultMember/comments/2026-07-17"), [{ who: "아이", text: "힘내세요" }]));
     await assertSucceeds(set(ref(db("adultA"), "families/familyA/people/ownerMember/comments/2026-07-17"), [{ who: "어른", text: "고마워요" }]));

@@ -93,6 +93,8 @@
   }
   .grape-done { text-align: center; font-size: 14px; color: #7C5296; font-weight: 700; padding: 4px 0; }
   .grape-count { font-size: 12px; color: #8B8680; margin-bottom: 6px; }
+  .grape-toggle { cursor: pointer; user-select: none; -webkit-user-select: none; }
+  .grape-toggle .chev { color: #8B8680; font-size: 10px; margin-left: 4px; }
   .grape-board { display: grid; grid-template-columns: repeat(15, 1fr); gap: 5px; }
   .grape-board .grape { width: 100%; aspect-ratio: 1; border-radius: 50%; background: #EFECE7; border: 1px solid #E2DED7; }
   .grape-board .grape.on { background: #8E62AC; border-color: #7C5296; }
@@ -147,6 +149,10 @@
   }
   #schedList .del {
     border: none; background: #FDE8E8; color: #D64545; border-radius: 6px;
+    width: 20px; height: 20px; font-size: 11px; cursor: pointer; flex-shrink: 0; align-self: center;
+  }
+  #schedList .rep {
+    border: none; background: #E8DFF3; color: #5B4874; border-radius: 6px;
     width: 20px; height: 20px; font-size: 11px; cursor: pointer; flex-shrink: 0; align-self: center;
   }
   #schedTimeline { flex: 0 0 75px; }
@@ -467,6 +473,27 @@
   #cmCancel { background: #F1EDE3; color: var(--ink2); }
   #cmOk { background: var(--grape); color: #fff; }
 
+  /* 시간표 반복 설정 팝업 */
+  #repeatModal {
+    position: fixed; inset: 0; z-index: 200; background: rgba(63,55,47,0.45);
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .rp-opts { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 12px; }
+  .rp-opt {
+    border: 1.5px solid #E4DCEE; background: #fff; color: var(--ink);
+    border-radius: 12px; padding: 11px; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+  }
+  .rp-opt.on { border-color: var(--grape); background: var(--grape-soft); color: var(--grape-d); }
+  .rp-days { display: flex; justify-content: center; gap: 5px; margin: 0 0 12px; }
+  .rp-days button {
+    width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #E4DCEE;
+    background: #fff; color: var(--ink2); font-size: 12px; font-weight: 700;
+    cursor: pointer; font-family: inherit; padding: 0;
+  }
+  .rp-days button.on { border-color: var(--grape); background: var(--grape); color: #fff; }
+  .rp-note { font-size: 12px; color: #8B8680; margin-bottom: 14px; }
+
   /* 포도알플래너 전용 화면 보정 */
   header { padding-right: 34px; }
   #settingsBtn { top: 50%; transform: translateY(-50%); }
@@ -771,6 +798,32 @@
   </div>
 </div>
 
+<div id="repeatModal" style="display:none">
+  <div class="cm-box">
+    <div class="cm-emoji">🔁</div>
+    <p id="rpTitle"></p>
+    <div class="rp-opts">
+      <button class="rp-opt" data-mode="daily">매일 반복</button>
+      <button class="rp-opt" data-mode="weekly" id="rpWeekly">매주 반복</button>
+      <button class="rp-opt" data-mode="days">요일 골라서 반복</button>
+    </div>
+    <div class="rp-days" id="rpDays" style="display:none">
+      <button data-d="1">월</button>
+      <button data-d="2">화</button>
+      <button data-d="3">수</button>
+      <button data-d="4">목</button>
+      <button data-d="5">금</button>
+      <button data-d="6">토</button>
+      <button data-d="0">일</button>
+    </div>
+    <div class="rp-note">선택한 날짜부터 8주 동안 일괄 반영돼요</div>
+    <div class="cm-btns">
+      <button id="rpCancel">취소</button>
+      <button id="rpOk">적용</button>
+    </div>
+  </div>
+</div>
+
 <script src="firebase-config.js"></script>
 <script type="module">
 /* ===== 상태 ===== */
@@ -778,6 +831,7 @@ let data = null;
 let currentMemberId = null;
 let selectedDate = todayStr();
 let editingItems = false;
+let grapeBoardOpen = false; // 이번 판 포도알 30칸: 기본 접힘, 캡션 누르면 펼침
 let editingSched = false;
 let editingPhone = false;
 let calCursor = { y: new Date().getFullYear(), m: new Date().getMonth() + 1 };
@@ -1489,7 +1543,7 @@ function renderChecklist() {
   document.getElementById("progressLabel").textContent =
     total ? `${done} / ${total} 완료 (${pct}%)` : "항목을 추가해 주세요";
 
-  document.getElementById("itemAddRow").style.display = canEdit && editingItems ? "flex" : "none";
+  document.getElementById("itemAddRow").style.display = canEdit ? "flex" : "none";
   const btn = document.getElementById("editItemsBtn");
   btn.style.display = canEdit ? "" : "none";
   btn.textContent = editingItems ? "완료" : "항목 편집";
@@ -1504,12 +1558,24 @@ function renderGrapes(done, total) {
   const count = Object.keys(grapes).length;
   let html = "";
 
+  const requests = personOf(m.id).grapeRequests || {};
+  const mine = myMember();
+  const isSelfChild = fbMode && !!(mine && mine.id === m.id && mine.role === "child");
   if (total > 0 && done === total) {
     if (grapes[selectedDate]) {
       const v = grapeVariant(selectedDate);
       html += `<div class="grape-done">${fmtDate(selectedDate)} ${v === 4 ? "포도쥬스 당첨! 🧃" : "포도알 획득!"}</div>`;
+    } else if (requests[selectedDate]) {
+      if (canRewardMember(m)) {
+        html += `<div class="grape-done">💌 포도알 요청이 도착했어요!</div>`;
+        html += `<button class="grape-btn" id="giveGrapeBtn">승인하고 포도알 주기</button>`;
+      } else {
+        html += `<div class="grape-done">엄마·아빠에게 포도알 요청 알림이 갔어요 💌<br>승인을 기다리고 있어요</div>`;
+      }
     } else if (canRewardMember(m)) {
       html += `<button class="grape-btn" id="giveGrapeBtn">다 했어요! 포도알 주세요</button>`;
+    } else if (isSelfChild) {
+      html += `<button class="grape-btn" id="requestGrapeBtn">다 했어요! 포도알 주세요</button>`;
     }
   }
   const bunches = Math.floor(count / 30);
@@ -1520,10 +1586,10 @@ function renderGrapes(done, total) {
   if (bunches > 0) {
     html += `<div class="grape-count" style="margin-top:8px">완성한 포도송이 🍇 <b>${bunches}</b>송이</div>`;
   }
-  html += `<div class="grape-count" style="margin-top:${bunches > 0 ? 2 : 10}px">이번 판 포도알 <b>${cur}</b>개 (30개 모으면 포도송이 완성)</div>`;
+  html += `<div class="grape-count grape-toggle" id="grapeToggle" style="margin-top:${bunches > 0 ? 2 : 10}px">이번 판 포도알 <b>${cur}</b>개 (30개 모으면 포도송이 완성)<span class="chev">${grapeBoardOpen ? "▲" : "▼"}</span></div>`;
   // 이번 판에 해당하는 날짜들 (완성된 송이 30개 단위 제외)
   const curDates = Object.keys(grapes).sort().slice(bunches * 30);
-  html += `<div class="grape-board">`;
+  html += `<div class="grape-board" style="display:${grapeBoardOpen ? "" : "none"}">`;
   for (let i = 0; i < 30; i++) {
     const inner = i < cur
       ? `<div class="grape on">${GRAPE_IMGS[grapeVariant(curDates[i])]}</div>`
@@ -1536,6 +1602,15 @@ function renderGrapes(done, total) {
   const giveBtn = document.getElementById("giveGrapeBtn");
   if (giveBtn) giveBtn.addEventListener("click", () => {
     store.write(`people/${m.id}/grapes/${selectedDate}`, true);
+    if (requests[selectedDate]) store.write(`people/${m.id}/grapeRequests/${selectedDate}`, null);
+  });
+  const reqBtn = document.getElementById("requestGrapeBtn");
+  if (reqBtn) reqBtn.addEventListener("click", () => {
+    store.write(`people/${m.id}/grapeRequests/${selectedDate}`, true);
+  });
+  document.getElementById("grapeToggle").addEventListener("click", () => {
+    grapeBoardOpen = !grapeBoardOpen;
+    renderGrapes(done, total);
   });
 }
 
@@ -1591,7 +1666,7 @@ function renderSchedule() {
         <input class="t-end" inputmode="numeric" maxlength="5" placeholder="종료시간" value="${escapeHtml(li.dataset.end)}" ${canEdit ? "" : "disabled"}>
       </span>
       <input class="s-text" maxlength="30" value="${item ? escapeHtml(item.text) : ""}" ${canEdit ? "" : "disabled"}>
-      ${item && editingSched ? `<button class="del">✕</button>` : ""}`;
+      ${item && editingSched ? `<button class="rep" title="반복 설정">🔁</button><button class="del">✕</button>` : ""}`;
     const tStart = li.querySelector(".t-start"), tEnd = li.querySelector(".t-end");
     const syncTime = () => {
       const s = parseTimeStr(tStart.value);
@@ -1612,6 +1687,8 @@ function renderSchedule() {
       txt.value = ""; li.dataset.time = ""; li.dataset.end = "";
       saveScheduleFromRows();
     });
+    const rep = li.querySelector(".rep");
+    if (rep) rep.addEventListener("click", () => openRepeatModal(m.id, item));
     ul.appendChild(li);
   }
   const sBtn = document.getElementById("editSchedBtn");
@@ -1620,6 +1697,75 @@ function renderSchedule() {
   sBtn.classList.toggle("editing", editingSched);
   renderTimeline(sched, document.getElementById("schedTimeline"));
 }
+
+/* ===== 시간표 반복 설정 ===== */
+const DOW_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
+let repeatCtx = null; // { mid, item, mode, days:Set }
+
+function openRepeatModal(mid, item) {
+  repeatCtx = { mid, item, mode: null, days: new Set() };
+  const label = item.text || item.time;
+  document.getElementById("rpTitle").textContent = `"${label}"\n반복 설정`;
+  const dow = new Date(selectedDate + "T00:00:00").getDay();
+  document.getElementById("rpWeekly").textContent = `매주 반복 (${DOW_NAMES[dow]}요일마다)`;
+  document.querySelectorAll("#repeatModal .rp-opt").forEach(b => b.classList.remove("on"));
+  document.querySelectorAll("#rpDays button").forEach(b => b.classList.remove("on"));
+  document.getElementById("rpDays").style.display = "none";
+  document.getElementById("repeatModal").style.display = "flex";
+}
+
+document.querySelectorAll("#repeatModal .rp-opt").forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (!repeatCtx) return;
+    repeatCtx.mode = btn.dataset.mode;
+    document.querySelectorAll("#repeatModal .rp-opt").forEach(b => b.classList.toggle("on", b === btn));
+    document.getElementById("rpDays").style.display = repeatCtx.mode === "days" ? "flex" : "none";
+  });
+});
+document.querySelectorAll("#rpDays button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (!repeatCtx) return;
+    const d = Number(btn.dataset.d);
+    if (repeatCtx.days.has(d)) { repeatCtx.days.delete(d); btn.classList.remove("on"); }
+    else { repeatCtx.days.add(d); btn.classList.add("on"); }
+  });
+});
+document.getElementById("rpCancel").addEventListener("click", () => {
+  document.getElementById("repeatModal").style.display = "none";
+  repeatCtx = null;
+});
+document.getElementById("rpOk").addEventListener("click", () => {
+  if (!repeatCtx || !repeatCtx.mode) return;
+  if (repeatCtx.mode === "days" && repeatCtx.days.size === 0) return;
+  const { mid, item, mode, days } = repeatCtx;
+  const m = members().find(x => x.id === mid);
+  if (!m || !canEditMember(m)) return;
+  const start = new Date(selectedDate + "T00:00:00");
+  const baseDow = start.getDay();
+  const schedAll = { ...(personOf(mid).schedule || {}) };
+  let applied = 0;
+  for (let d = 1; d <= 55; d++) { // 시작 날짜 다음날부터 8주(56일)까지
+    const dt = new Date(start);
+    dt.setDate(start.getDate() + d);
+    const dow = dt.getDay();
+    const hit = mode === "daily" || (mode === "weekly" && dow === baseDow) || (mode === "days" && days.has(dow));
+    if (!hit) continue;
+    const ds = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+    const arr = (schedAll[ds] || []).slice();
+    const dup = arr.some(r => r.time === item.time && (r.end || "") === (item.end || "") && r.text === item.text);
+    if (dup) continue;
+    arr.push({ time: item.time, end: item.end || "", text: item.text });
+    schedAll[ds] = arr;
+    applied++;
+  }
+  store.write(`people/${mid}/schedule`, schedAll);
+  document.getElementById("repeatModal").style.display = "none";
+  repeatCtx = null;
+  const hint = document.querySelector(".sched-hint");
+  const orig = hint.textContent;
+  hint.textContent = `🔁 앞으로 8주 동안 ${applied}일에 반영했어요`;
+  setTimeout(() => { hint.textContent = orig; }, 4000);
+});
 
 // 왼쪽 표의 모든 줄을 읽어 계획표로 저장
 function saveScheduleFromRows() {
