@@ -19,4 +19,6 @@ for (const file of files) {
   await cp(file, `www/${file}`);
 }
 
-console.log(`Android web files prepared: ${files.length}`);
+await cp("fonts", "www/fonts", { recursive: true });
+
+console.log(`Android web files prepared: ${files.length} + fonts`);
